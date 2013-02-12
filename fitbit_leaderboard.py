@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from contextlib import closing
-from datetime import datetime
+from datetime import datetime, date
 import oauth2 as oauth
 import sqlite3
 
@@ -91,10 +91,12 @@ def show_todays_steps():
 	user_cur = g.db.execute('select username, fitbit_user_key, fitbit_user_secret from user order by user_id desc')
 	users = [dict(username=row[0], fitbit_user_key=row[1], fitbit_user_secret=row[2]) for row in user_cur.fetchall()]
 	user_steps = []
+	mdate = date(2012, 10, 12)
+	mdate = mdate.strftime('%Y-%m-%d')
 	for user in users: 
 		oauth_fitbit = fitbit.Fitbit(consumer_key, consumer_secret, user_key=user['fitbit_user_key'], user_secret=user['fitbit_user_secret'])
-		step_response = oauth_fitbit.activities()
-		return step_response
+		step_response = oauth_fitbit.activities(date=mdate)
+		return str(step_response["summary"])
 		user_steps.append(step_response)
 
 	return user_steps
