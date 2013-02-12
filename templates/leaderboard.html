@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block content %}
+<p> seriously? </p>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<div id="rect-demo"></div>
+
+<script>
+var rectDemo = d3.select("#rect-demo").
+  append("svg:svg").
+  attr("width", 400).
+  attr("height", 300);
+
+rectDemo.append("svg:rect").
+  attr("x", 100).
+  attr("y", 100).
+  attr("height", 100).
+  attr("width", 200);
+
+</script>
+
+{% endblock %}

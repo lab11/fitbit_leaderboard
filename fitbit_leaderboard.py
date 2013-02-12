@@ -69,10 +69,9 @@ def registered():
 		elif not request.cookies.get('request_token_key'):
 			return "No request token key"
 		elif not request.cookies.get('request_token_secret'):
-			return "NO request token secret"
+			return "No request token secret"
 		else:
 			request_token = oauth.Token(request.cookies.get('request_token_key'), request.cookies.get('request_token_secret'))
-			#return "request_token.secret: %s request_token.key: %s" % (request.cookies.get('request_token_secret'), request.cookies.get('request_token_key'))
 			user_token = uauth_client.client.fetch_access_token(request_token, request.form['fitbit_verifier'])
 			g.db.execute('insert into user (username, fitbit_verifier, fitbit_user_key, fitbit_user_secret) values (?, ?, ?, ?)', [request.form['username'], request.form['fitbit_verifier'], user_token.key, user_token.secret])
 			g.db.commit()
@@ -91,15 +90,17 @@ def show_todays_steps():
 	user_cur = g.db.execute('select username, fitbit_user_key, fitbit_user_secret from user order by user_id desc')
 	users = [dict(username=row[0], fitbit_user_key=row[1], fitbit_user_secret=row[2]) for row in user_cur.fetchall()]
 	user_steps = []
-	mdate = date(2012, 10, 12)
-	mdate = mdate.strftime('%Y-%m-%d')
 	for user in users: 
 		oauth_fitbit = fitbit.Fitbit(consumer_key, consumer_secret, user_key=user['fitbit_user_key'], user_secret=user['fitbit_user_secret'])
-		step_response = oauth_fitbit.activities(date=mdate)
-		return str(step_response["summary"])
-		user_steps.append(step_response)
+		step_response = oauth_fitbit.activities()
+		user_steps.append(user['username'])
+		user_steps.append(step_response['summary']['steps'])
 
-	return user_steps
+	return str(user_steps)
+
+@app.route("/leaderboard")
+def leaderboard():
+	return render_template('leaderboard.html')
 
 if __name__ == '__main__':
 	app.run(debug=True)
