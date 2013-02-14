@@ -16,6 +16,16 @@ PASSWORD = 'sharedspace'
 consumer_key = '4f0defd304af44e9a6790b0087070313'
 consumer_secret = '737d767bf5024fda928ea039d77e1098'
 
+day_converter = {
+	0: 'm', 
+	1: 't', 
+	2: 'w',
+	3: 'th',
+	4: 'f',
+	5: 's', 
+	6: 'sun'
+}
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 
@@ -97,6 +107,27 @@ def show_todays_steps():
 		user_steps.append(step_response['summary']['steps'])
 
 	return str(user_steps)
+
+@app.route("/show_weekly_steps")
+def show_weekly_steps():
+	user_cur = g.db.execute('select username, fitbit_user_key, fitbit_user_secret from user order by user_id desc')
+	users = [dict(username=row[0], fitbit_user_key=row[1], fitbit_user_secret=row[2]) for row in user_cur.fetchall()]
+	data = []
+	for user in users: 
+		oauth_fitbit = fitbit.Fitbit(consumer_key, consumer_secret, user_key=user['fitbit_user_key'], user_secret=user['fitbit_user_secret'])
+		step_response = oauth_fitbit.time_series('activities/steps', period='1w')
+		temp = {}
+		temp['username'] = user['username']
+		temp['total_steps'] = 0
+		temp['step_counts'] = []
+		for day in step_response['activities-steps']:
+			mdate = datetime.strptime(day['dateTime'], "%Y-%m-%d")
+			mweekday = day_converter[mdate.weekday()]
+			temp['step_counts'].append( { mweekday:int(day['value']) } )
+			temp['total_steps'] ++ int(day['value'])
+		data.append(temp)
+
+	return str(data)
 
 @app.route("/leaderboard")
 def leaderboard():

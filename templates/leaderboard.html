@@ -1,21 +1,125 @@
 {% extends "layout.html" %}
 {% block content %}
 <p> seriously? </p>
-<script src="http://d3js.org/d3.v3.min.js"></script>
 
-<div id="rect-demo"></div>
+<style>
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+
+<div id="cse-leaderboard"></div>
 
 <script>
-var rectDemo = d3.select("#rect-demo").
-  append("svg:svg").
-  attr("width", 400).
-  attr("height", 300);
+var data = [
+	{
+		 "username": "bradjc",
+     "total_steps": 280,
+		 "step_counts": [
+        {"day": "m", "steps":10},
+        {"day": "t", "steps":20},
+        {"day": "w", "steps":30},
+        {"day": "th", "steps":40},
+        {"day": "f", "steps":50},
+        {"day": "s", "steps":60},
+        {"day": "sun", "steps":70}
+     ]
+	}, 
+  {
+     "username": "wwhuang",
+     "total_steps": 2800,
+     "step_counts": [
+        {"day": "m", "steps":100},
+        {"day": "t", "steps":200},
+        {"day": "w", "steps":300},
+        {"day": "th", "steps":400},
+        {"day": "f", "steps":500},
+        {"day": "s", "steps":600},
+        {"day": "sun", "steps":700}
+     ]
+  }
+]
 
-rectDemo.append("svg:rect").
-  attr("x", 100).
-  attr("y", 100).
-  attr("height", 100).
-  attr("width", 200);
+data.forEach(function(d) {
+  var y0 = 0;
+  d.step_counts.forEach(function(daystep){
+    daystep.y0 = y0;
+    daystep.y1 = y0 + daystep.steps;
+    y0 = daystep.y1;
+  });
+});
+var margin = {top: 20, right: 20, bottom: 30, left: 40}
+var width = 960 - margin.left - margin.right
+var height = 500 - margin.top - margin.bottom
+
+var xScale = d3.scale.ordinal()
+	.domain(data.map(function(d){return d.username}))
+    .rangeRoundBands([0, width], .1);
+
+var yScale = d3.scale.linear()
+	.domain([0, d3.max(data, function(d){ return d.total_steps; } )])
+	.rangeRound([height, 0]);
+
+var cScale = d3.scale.ordinal()
+    .domain(["m", "t", "w", "th", "f", "s", "sun"])
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+var xAxis = d3.svg.axis()
+	.scale(xScale)
+	.orient("bottom");
+
+var yAxis = d3.svg.axis()
+	.scale(yScale)
+	.orient("left")
+	.tickFormat(d3.format(".2s"));
+
+var svg = d3.select("#cse-leaderboard").append("svg")
+	.attr("width", width + margin.left + margin.right)
+	.attr("height", height + margin.top + margin.bottom)
+.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(xAxis);
+
+svg.append("g")
+  .attr("class", "y axis")
+  .call(yAxis)
+.append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .style("text-anchor", "end")
+  .text("Steps");
+
+var user_steps = svg.selectAll('.user_steps')
+	.data(data)
+  .enter().append("g")
+  	.attr("class", "g")
+  	.attr("transform", function(d) {return "translate(" + xScale(d.username) + ",0)";});
+
+user_steps.selectAll("rect")
+	.data( function(d){ return d.step_counts } )
+  .enter().append("rect")
+  .attr("width", xScale.rangeBand())
+  .attr("y", function(d){ return yScale(d.y1); })
+  .attr("height", function(d){ return yScale(d.y0) - yScale(d.y1); })
+  .style("fill", function(d){ return cScale(d.day) });
 
 </script>
 
