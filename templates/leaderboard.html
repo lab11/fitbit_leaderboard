@@ -24,34 +24,7 @@
 <div id="cse-leaderboard"></div>
 
 <script>
-var data = [
-	{
-		 "username": "bradjc",
-     "total_steps": 280,
-		 "step_counts": [
-        {"day": "m", "steps":10},
-        {"day": "t", "steps":20},
-        {"day": "w", "steps":30},
-        {"day": "th", "steps":40},
-        {"day": "f", "steps":50},
-        {"day": "s", "steps":60},
-        {"day": "sun", "steps":70}
-     ]
-	}, 
-  {
-     "username": "wwhuang",
-     "total_steps": 2800,
-     "step_counts": [
-        {"day": "m", "steps":100},
-        {"day": "t", "steps":200},
-        {"day": "w", "steps":300},
-        {"day": "th", "steps":400},
-        {"day": "f", "steps":500},
-        {"day": "s", "steps":600},
-        {"day": "sun", "steps":700}
-     ]
-  }
-]
+var data = {{data|safe}}
 
 data.forEach(function(d) {
   var y0 = 0;

@@ -95,43 +95,27 @@ def show_users():
 	users = [dict(username=row[0], fitbit_verifier=row[1], fitbit_user_key=row[2], fitbit_user_secret=row[3]) for row in cur.fetchall()]
 	return render_template('show_users.html', users=users)
 
-@app.route("/show_todays_steps")
-def show_todays_steps():
-	user_cur = g.db.execute('select username, fitbit_user_key, fitbit_user_secret from user order by user_id desc')
-	users = [dict(username=row[0], fitbit_user_key=row[1], fitbit_user_secret=row[2]) for row in user_cur.fetchall()]
-	user_steps = []
-	for user in users: 
-		oauth_fitbit = fitbit.Fitbit(consumer_key, consumer_secret, user_key=user['fitbit_user_key'], user_secret=user['fitbit_user_secret'])
-		step_response = oauth_fitbit.activities()
-		user_steps.append(user['username'])
-		user_steps.append(step_response['summary']['steps'])
-
-	return str(user_steps)
-
-@app.route("/show_weekly_steps")
-def show_weekly_steps():
+@app.route("/leaderboard")
+def leaderboard():
 	user_cur = g.db.execute('select username, fitbit_user_key, fitbit_user_secret from user order by user_id desc')
 	users = [dict(username=row[0], fitbit_user_key=row[1], fitbit_user_secret=row[2]) for row in user_cur.fetchall()]
 	data = []
 	for user in users: 
 		oauth_fitbit = fitbit.Fitbit(consumer_key, consumer_secret, user_key=user['fitbit_user_key'], user_secret=user['fitbit_user_secret'])
 		step_response = oauth_fitbit.time_series('activities/steps', period='1w')
-		temp = {}
-		temp['username'] = user['username']
-		temp['total_steps'] = 0
-		temp['step_counts'] = []
+		user_info = {}
+		user_info['username'] = user['username'].encode('ascii')
+		user_info['total_steps'] = 0
+		user_info['step_counts'] = []
 		for day in step_response['activities-steps']:
 			mdate = datetime.strptime(day['dateTime'], "%Y-%m-%d")
 			mweekday = day_converter[mdate.weekday()]
-			temp['step_counts'].append( { mweekday:int(day['value']) } )
-			temp['total_steps'] ++ int(day['value'])
-		data.append(temp)
+			user_info['step_counts'].append( { 'day':mweekday, 'steps':int(day['value']) } )
+			user_info['total_steps'] += int(day['value'])
+		data.append(user_info)
 
-	return str(data)
-
-@app.route("/leaderboard")
-def leaderboard():
-	return render_template('leaderboard.html')
+	data = sorted(data, key=lambda user_info: user_info['total_steps'], reverse=True)
+	return render_template('leaderboard.html', data=data)
 
 if __name__ == '__main__':
 	app.run(debug=True)
