@@ -4,7 +4,7 @@ from datetime import datetime, date
 import oauth2 as oauth
 import sqlite3
 
-from flask import Flask, render_template, request, g, make_response
+from flask import Flask, render_template, request, g, make_response, jsonify
 import fitbit
 
 #config 
