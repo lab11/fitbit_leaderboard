@@ -19,7 +19,7 @@ class fitbit_manager:
 		self.db = db
 		pass
 
-	def update (self):
+	def update (self, number_of_days=1):
 		users = self.db.get_users()
 
 		for user in users:
@@ -28,13 +28,15 @@ class fitbit_manager:
 					                         CONSUMER_SECRET,
 					                         user_key=user['key'],
 					                         user_secret=user['secret'])
-				res = oauth_fitbit.time_series('activities/steps', period='1d')
+				res = oauth_fitbit.time_series('activities/steps',
+					                           period='{0}d'.format(number_of_days))
 				print res
 				userid = int(user['id'])
-				day = res['activities-steps'][0]['dateTime']
-				steps = int(res['activities-steps'][0]['value'])
+				for item in res['activities-steps']:
+					day = item['dateTime']
+					steps = int(item['value'])
 
-				self.db.update_steps(userid, day, steps)
+					self.db.update_steps(userid, day, steps)
 			except fitbit.exceptions.HTTPUnauthorized as e:
 				print e
 
