@@ -82,6 +82,7 @@ function getInfoAndRender() {
 }
 
 function updateLeaderBoard(data) {
+  console.log(data);
   var xNew = xScale.domain(data.map(function(d){return d.username})).copy();
   var yNew = yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]).copy();
   var step_array = []
@@ -99,7 +100,7 @@ function updateLeaderBoard(data) {
 
   var user_steps = svg.selectAll("rect")
   	.data( step_array )
-    
+
   user_steps.transition()
       .duration(750)
       .attr("x", function(d){ return d.x })
