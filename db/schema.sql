@@ -1,19 +1,22 @@
 PRAGMA foreign_keys = ON;
 
-drop table if exists user;
-create table user (
-  user_id integer primary key autoincrement,
-  username string unique not null,
-  fitbit_verifier string not null, 
-  fitbit_user_key string not null, 
-  fitbit_user_secret string not null
+DROP TABLE IF EXISTS users;
+CREATE TABLE users (
+  id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+  username           STRING NOT NULL,
+  fitbit_verifier    STRING NOT NULL,
+  fitbit_user_key    STRING NOT NULL,
+  fitbit_user_secret STRING NOT NULL
 );
+CREATE UNIQUE INDEX fitbit_user ON users(fitbit_verifier, fitbit_user_key, fitbit_user_secret);
 
-drop table if exists fitbit_steps;
-create table fitbit_steps (
-	pkey integer primary key autoincrement,
-	fitbit_user integer,
-	steps integer not null, 
-	mtime datetime not null,
-	foreign key(fitbit_user) references user(user_id)
+DROP TABLE IF EXISTS fitbit_steps;
+CREATE TABLE fitbit_steps (
+	id      INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,
+	day     DATE NOT NULL,
+	steps   INTEGER NOT NULL,
+	FOREIGN KEY(user_id) REFERENCES user(id)
 );
+CREATE UNIQUE INDEX day_steps ON fitbit_steps(user_id, day);
+
