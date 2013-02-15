@@ -67,10 +67,12 @@ svg.append("g")
 // Set up our days to color mapping
 var cScale = d3.scale.ordinal()
   .domain(["m", "t", "w", "th", "f", "s", "sun"])
-  .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+  .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", "#B7BF10", "#FFC72C", "#F6D565"]);
+
+getInfoAndRender();
 
 // Run our leaderboard on a loop, updating every 10 seconds
-var looper = setInterval(function(){getInfoAndRender()}, 5000)
+var looper = setInterval(function(){getInfoAndRender()}, 10000)
 
 // Gets the data from the server, passes it to our D3 js
 function getInfoAndRender() {
