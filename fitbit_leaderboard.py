@@ -3,6 +3,8 @@ from contextlib import closing
 from datetime import datetime, date
 import oauth2 as oauth
 import json
+from threading import Timer
+import time
 
 from flask import Flask, render_template, request, g, make_response, jsonify
 
@@ -24,6 +26,16 @@ fm = fitbit_manager.fitbit_manager(db)
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(7)
+
+# Start the periodic event to query fitbit
+def update_fitbit ():
+	while True:
+		uffm = fitbit_manager.fitbit_manager(fitbit_db.fitbit_db('fitbit.db'))
+		uffm.update()
+		time.sleep(300)
+
+t = Timer(1, update_fitbit)
+t.start()
 
 
 @app.before_request
