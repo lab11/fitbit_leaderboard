@@ -17,7 +17,9 @@ day_converter = {
 class fitbit_manager:
 	def __init__ (self, db):
 		self.db = db
-		pass
+
+	def set_db (self, db):
+		self.db = db
 
 	def update (self, number_of_days=1):
 		users = self.db.get_users()
@@ -58,18 +60,10 @@ class fitbit_manager:
 			users[username].setdefault('step_counts', [])
 			users[username]['step_counts'].append({'day':day, 'steps':steps})
 
-		print users
-
 		data = []
 		for k,v in users.iteritems():
-			data.append({'username':k, 'total':v['total'], 'step_counts':v['step_counts']})
+			data.append({'username':k, 'total_steps':v['total'], 'step_counts':v['step_counts']})
 
+		data = sorted(data, key=lambda user_info: user_info['total_steps'], reverse=True)
 		print data
-
-		data = sorted(data, key=lambda user_info: user_info['total'], reverse=True)
-		print data
-
-
-
-
-
+		return data
