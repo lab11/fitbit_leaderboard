@@ -89,7 +89,7 @@ function updateLeaderBoard(data) {
     d.step_counts.forEach(function(daystep){
       daystep.y0 = y0;
       daystep.y1 = y0 + daystep.steps;
-      daystep.x = xNew(d.username)
+      daystep.x = xScale(d.username)
       y0 = daystep.y1;
       step_array.push(daystep)
     });
@@ -101,13 +101,14 @@ function updateLeaderBoard(data) {
   user_steps.transition()
       .duration(750)
       .attr("x", function(d){ return d.x })
-      .attr("y", function(d){ return yNew(d.y1) })
-      .attr("height", function(d){ return yNew(d.y0) - yNew(d.y1) })
+      .attr("y", function(d){ return yScale(d.y1) })
+      .attr("height", function(d){ return yScale(d.y0) - yScale(d.y1) })
       .style("fill", function(d){ return cScale(d.day) });
 
   user_steps.enter()
       .append("rect")
       .attr("width", xScale.rangeBand())
+      .attr("x", function(d){ return d.x })
       .attr("y", function(d){ return yScale(d.y1); })
       .attr("height", function(d){ return yScale(d.y0) - yScale(d.y1); })
       .style("fill", function(d){ return cScale(d.day) })
