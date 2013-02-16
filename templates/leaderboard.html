@@ -21,9 +21,9 @@
 
 <script>
 
-var margin = {top: 20, right: 20, bottom: 30, left: 40}
-var width = 960 - margin.left - margin.right
-var height = 500 - margin.top - margin.bottom
+var margin = {top: 20, right: 20, bottom: 100, left: 40}
+var width = document.documentElement.clientWidth   - 2 * margin.left - margin.right - 200
+var height = document.documentElement.clientHeight   - 2 * margin.top - margin.bottom
 
 // Set up d3 SVG
 var svg = d3.select("#cse-leaderboard").append("svg")
@@ -135,6 +135,33 @@ function updateLeaderBoard(data) {
     .transition()
     .duration(500)
     .call(yAxis);
+
+  var step_labels = svg.selectAll(".step-labels")
+                      .data(data)
+
+  step_labels.transition()
+    .duration(750)
+    .text(function(d){ return d.total_steps })
+    .attr("x", function(d){ return xScale(d.username) + xScale.rangeBand()/2 })
+    .attr("y", function(d){ return yScale(d.total_steps) - 4 });
+
+  step_labels.enter()
+    .append("text")
+    .attr("class", "step-labels")
+    .attr("text-anchor", "middle")
+    .text(function(d){ return d.total_steps })
+    .transition()
+    .duration(750)
+    .attr("x", function(d){ return xScale(d.username) + xScale.rangeBand()/2  })
+    .attr("y", function(d){ return yScale(d.total_steps) - 4});
+
+  step_labels.exit()
+    .transition()
+    .duration(750)
+    .style("opacity", 0)
+    .remove();
+
+
 }
 </script>
 

@@ -24,7 +24,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 db = fitbit_db.fitbit_db(DATABASE)
-fm = fitbit_manager.fitbit_manager(db)
+fm = fitbit_manager.fitbit_manager()
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
