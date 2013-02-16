@@ -87,11 +87,6 @@ def registered():
 	else:
 		return "Method error"
 
-@app.route("/show_users")
-def show_users():
-	users = g.db.get_users()
-	return render_template('show_users.html', users=users)
-
 @app.route("/group_info")
 def group_info():
 	data = fm.retrieve(db=g.db)
