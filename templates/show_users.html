@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
-  <p> woo bugs! </p>
   <ul class=users>
   {% for user in users %}
-    <li><h2>{{ user.username }}</h2>{{ user.fitbit_verifier }} key {{user.fitbit_user_key}} secret {{user.fitbit_user_secret}}
+    <li><h2>{{ user.name }}</h2>key {{user.key}} secret {{user.secret}}
   {% else %}
     <li><em>Unbelievable.  No entries here so far</em>
   {% endfor %}
