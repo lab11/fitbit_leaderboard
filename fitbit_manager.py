@@ -15,14 +15,11 @@ day_converter = {
 }
 
 class fitbit_manager:
-	def __init__ (self, db):
-		self.db = db
+	def __init__ (self):
+		pass
 
-	def set_db (self, db):
-		self.db = db
-
-	def update (self, number_of_days=1):
-		users = self.db.get_users()
+	def update (self, db, number_of_days=1):
+		users = db.get_users()
 
 		for user in users:
 			try:
@@ -38,12 +35,12 @@ class fitbit_manager:
 					day = item['dateTime']
 					steps = int(item['value'])
 
-					self.db.update_steps(userid, day, steps)
+					db.update_steps(userid, day, steps)
 			except fitbit.exceptions.HTTPUnauthorized as e:
 				print e
 
-	def retrieve (self):
-		week_data = self.db.get_week()
+	def retrieve (self, db):
+		week_data = db.get_week()
 
 		users = {}
 
