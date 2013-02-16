@@ -5,6 +5,7 @@ import oauth2 as oauth
 import json
 from threading import Timer
 import time
+from math import ceil
 
 from flask import Flask, render_template, request, g, make_response, jsonify
 
@@ -17,6 +18,7 @@ DEBUG = True
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
 PASSWORD = 'sharedspace'
+REQUESTS_PER_DAY = 2000	# Fitbit API limits to 2000 requests per day
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -30,9 +32,14 @@ fm.update(7)
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
-		uffm = fitbit_manager.fitbit_manager(fitbit_db.fitbit_db('fitbit.db'))
+		db = fitbit_db.fitbit_db('fitbit.db')
+		uffm = fitbit_manager.fitbit_manager(db)
 		uffm.update()
-		time.sleep(300)
+
+		MINUTES = 24 * 60.
+		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
+		rate *= 2	# Halve request rate as a saftey margin
+		sleep(rate)
 
 t = Timer(1, update_fitbit)
 t.start()
