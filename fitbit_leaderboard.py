@@ -39,7 +39,7 @@ def update_fitbit ():
 		MINUTES = 24 * 60.
 		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
 		rate *= 2	# Halve request rate as a saftey margin
-		sleep(rate)
+		sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
 t.start()
