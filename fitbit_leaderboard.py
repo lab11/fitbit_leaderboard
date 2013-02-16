@@ -30,6 +30,7 @@ fm = fitbit_manager.fitbit_manager()
 fm.update(db=db, number_of_days=7)
 
 # Start the periodic event to query fitbit
+
 def update_fitbit ():
 	while True:
 		db = fitbit_db.fitbit_db('fitbit.db')
@@ -39,11 +40,12 @@ def update_fitbit ():
 		MINUTES = 24 * 60.
 		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
 		rate *= 2	# Halve request rate as a saftey margin
+		db.close()
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
+t.daemon = True
 t.start()
-
 
 @app.before_request
 def before_request():
