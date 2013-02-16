@@ -27,19 +27,19 @@ db = fitbit_db.fitbit_db(DATABASE)
 fm = fitbit_manager.fitbit_manager(db)
 
 # Do an initial update to get a weeks worth of data at the least
-fm.update(7)
+fm.update(db=db, number_of_days=7)
 
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
 		db = fitbit_db.fitbit_db('fitbit.db')
-		uffm = fitbit_manager.fitbit_manager(db)
-		uffm.update()
+		uffm = fitbit_manager.fitbit_manager()
+		uffm.update(db=db)
 
 		MINUTES = 24 * 60.
 		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
 		rate *= 2	# Halve request rate as a saftey margin
-		sleep(rate * 60)	# Sleep operates in seconds, not minutes
+		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
 t.start()
@@ -47,14 +47,12 @@ t.start()
 
 @app.before_request
 def before_request():
-#	g.db = connect_db()
-	pass
+	g.db = fitbit_db.fitbit_db('fitbit.db')
 
 @app.teardown_request
 def teardown_request(exception):
-#	if hasattr(g, 'db'):
-#		g.db.close()
-	pass
+	if hasattr(g, 'db'):
+		g.db.close()
 
 @app.route('/')
 def home():
@@ -91,20 +89,17 @@ def registered():
 
 @app.route("/show_users")
 def show_users():
-	db = fitbit_db.fitbit_db('fitbit.db')
-	users = db.get_users()
+	users = g.db.get_users()
 	return render_template('show_users.html', users=users)
 
 @app.route("/group_info")
 def group_info():
-	fm.set_db(fitbit_db.fitbit_db('fitbit.db'))
-	data = fm.retrieve()
+	data = fm.retrieve(db=g.db)
 	return json.dumps(data)
 
 @app.route("/leaderboard")
 def leaderboard():
-	fm.set_db(fitbit_db.fitbit_db('fitbit.db'))
-	data = fm.retrieve()
+	data = fm.retrieve(db=g.db)
 	return render_template('leaderboard.html', data=data)
 
 if __name__ == '__main__':

@@ -47,6 +47,5 @@ class fitbit_db:
 
 		return week_data
 
-
-
-
+	def close (self):
+		self.db.close()
