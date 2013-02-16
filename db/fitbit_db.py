@@ -12,6 +12,7 @@ class fitbit_db:
 	def add_user (self, username, verify_str, user_key, user_secret):
 		user = ((username, verify_str, user_key, user_secret))
 		self.db.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", user)
+		self.db.commit()
 
 	def get_users (self):
 		cur = self.db.execute("SELECT * FROM users")

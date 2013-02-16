@@ -8,6 +8,7 @@ import time
 from math import ceil
 
 from flask import Flask, render_template, request, g, make_response, jsonify
+import fitbit
 
 from db import fitbit_db
 import fitbit_manager
@@ -19,6 +20,8 @@ SECRET_KEY = 'dev key'
 USERNAME = 'admin'
 PASSWORD = 'sharedspace'
 REQUESTS_PER_DAY = 2000	# Fitbit API limits to 2000 requests per day
+CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
+CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -30,7 +33,6 @@ fm = fitbit_manager.fitbit_manager()
 fm.update(db=db, number_of_days=7)
 
 # Start the periodic event to query fitbit
-
 def update_fitbit ():
 	while True:
 		db = fitbit_db.fitbit_db('fitbit.db')
@@ -62,8 +64,9 @@ def home():
 
 @app.route('/register')
 def register():
-	request_token = uauth_client.client.fetch_request_token()
-	fitbit_auth_url = uauth_client.client.authorize_token_url(request_token)
+	oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
+	request_token = oauth_fitbit.client.fetch_request_token()
+	fitbit_auth_url = oauth_fitbit.client.authorize_token_url(request_token)
 	response = make_response( render_template('register.html', fitbit_auth_url=fitbit_auth_url) )
 	response.set_cookie('request_token_key', request_token.key)
 	response.set_cookie('request_token_secret', request_token.secret)
@@ -81,10 +84,10 @@ def registered():
 		elif not request.cookies.get('request_token_secret'):
 			return "No request token secret"
 		else:
+			oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
 			request_token = oauth.Token(request.cookies.get('request_token_key'), request.cookies.get('request_token_secret'))
-			user_token = uauth_client.client.fetch_access_token(request_token, request.form['fitbit_verifier'])
-			g.db.execute('insert into user (username, fitbit_verifier, fitbit_user_key, fitbit_user_secret) values (?, ?, ?, ?)', [request.form['username'], request.form['fitbit_verifier'], user_token.key, user_token.secret])
-			g.db.commit()
+			user_token = oauth_fitbit.client.fetch_access_token(request_token, request.form['fitbit_verifier'])
+			g.db.add_user(request.form['username'], request.form['fitbit_verifier'], user_token.key, user_token.secret)
 		return render_template('registered.html')
 	else:
 		return "Method error"
