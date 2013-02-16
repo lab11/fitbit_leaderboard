@@ -23,7 +23,7 @@ REQUESTS_PER_DAY = 2000	# Fitbit API limits to 2000 requests per day
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-db = fitbit_db.fitbit_db('fitbit.db')
+db = fitbit_db.fitbit_db(DATABASE)
 fm = fitbit_manager.fitbit_manager(db)
 
 # Do an initial update to get a weeks worth of data at the least
