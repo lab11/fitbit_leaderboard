@@ -14,7 +14,7 @@ from db import fitbit_db
 import fitbit_manager
 
 #config
-DATABASE = 'fitbit.db'
+DATABASE = '/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db'
 DEBUG = True
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
@@ -36,7 +36,7 @@ fm.update(db=db, number_of_days=7)
 def update_fitbit ():
 	while True:
 		print "Fitbit Online Update"
-		db = fitbit_db.fitbit_db('fitbit.db')
+		db = fitbit_db.fitbit_db(DATABASE)
 		uffm = fitbit_manager.fitbit_manager()
 		uffm.update(db=db)
 
@@ -56,12 +56,16 @@ t.start()
 
 @app.before_request
 def before_request():
-	g.db = fitbit_db.fitbit_db('fitbit.db')
+	g.db = fitbit_db.fitbit_db(DATABASE)
 
 @app.teardown_request
 def teardown_request(exception):
 	if hasattr(g, 'db'):
 		g.db.close()
+
+@app.route('/fitbit')
+def fittest():
+	return "hello"
 
 @app.route('/')
 def home():
