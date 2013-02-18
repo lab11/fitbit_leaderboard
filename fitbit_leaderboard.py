@@ -14,7 +14,7 @@ from db import fitbit_db
 import fitbit_manager
 
 #config
-DATABASE = '/home/wwhuang/git/fitbit_leaderboard/fitbit.db'
+DATABASE = '/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db'
 DEBUG = True
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
