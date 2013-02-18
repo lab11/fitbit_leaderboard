@@ -15,16 +15,17 @@
 
   </head>
   <body>
+    {% set link_root = "/fitbit/" %}
     <div class="navbar navbar-inverse navbar-fixed-top" >
       <div class="navbar-inner" >
-        <a class="brand" href="leaderboard">CSE Fitbit Leaderboard</a>
+        <a class="brand" href={{link_root}}>CSE Fitbit Leaderboard</a>
       </div>
     </div>
     <script>
       $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
     <div class="container">
-      {% block content %}
+      {% block content scoped %}
       {% endblock %}
     </div>
   </body>

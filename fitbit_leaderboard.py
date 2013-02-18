@@ -14,7 +14,7 @@ from db import fitbit_db
 import fitbit_manager
 
 #config
-DATABASE = '/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db'
+DATABASE = '/home/wwhuang/git/fitbit_leaderboard/fitbit.db'
 DEBUG = True
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
@@ -32,7 +32,6 @@ fm = fitbit_manager.fitbit_manager()
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
 
-g.link_root = "/fitbit"
 
 # Start the periodic event to query fitbit
 def update_fitbit ():

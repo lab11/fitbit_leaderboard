@@ -76,7 +76,7 @@ var looper = setInterval(function(){getInfoAndRender()}, 10000)
 
 // Gets the data from the server, passes it to our D3 js
 function getInfoAndRender() {
-  $.getJSON($SCRIPT_ROOT + '/group_info', function(data) {
+  $.getJSON( $SCRIPT_ROOT + {{link_root}} + 'group_info', function(data) {
     updateLeaderBoard(data);
   });
 }
@@ -163,8 +163,6 @@ function updateLeaderBoard(data) {
     .duration(750)
     .style("opacity", 0)
     .remove();
-
-
 }
 </script>
 

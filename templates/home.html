@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<p> Woot, the home page! </p>
-<p>
-{{ globals["link_root"] }}
-</p>
+<p style="text-align:center"> Welcome to the Fitbit Leaderboard! </p>
+<p style="text-align:center"> <a href={{link_root + "register"}}> Register </a> </p>
+<p style="text-align:center"> <a style="text-align:center" href={{link_root + "leaderboard"}}>View the Leaderboard </a> </p>
 {% endblock %}

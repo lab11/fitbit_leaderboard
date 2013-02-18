@@ -32,7 +32,6 @@ class fitbit_db:
 	def get_week (self):
 		week = date.today()-timedelta(days=7)
 
-
 		q = """SELECT users.username, fitbit_steps.day, fitbit_steps.steps
 		       FROM users
 		       LEFT JOIN fitbit_steps
