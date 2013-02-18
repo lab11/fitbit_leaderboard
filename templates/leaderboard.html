@@ -98,6 +98,9 @@ function updateLeaderBoard(data) {
     });
   });
 
+  var font_adjuster = 22 - (22 % data.length)
+  $(".x-axis").css("font-size", String(font_adjuster + "px"))
+
   var user_steps = svg.selectAll("rect")
   	.data( step_array )
 

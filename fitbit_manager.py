@@ -20,6 +20,7 @@ class fitbit_manager:
 
 	def update (self, db, number_of_days=1):
 		users = db.get_users()
+		print "fitbit online update"
 
 		for user in users:
 			try:
@@ -29,7 +30,6 @@ class fitbit_manager:
 					                         user_secret=user['secret'])
 				res = oauth_fitbit.time_series('activities/steps',
 					                           period='{0}d'.format(number_of_days))
-				print res
 				userid = int(user['id'])
 				for item in res['activities-steps']:
 					day = item['dateTime']
@@ -62,5 +62,4 @@ class fitbit_manager:
 			data.append({'username':k, 'total_steps':v['total'], 'step_counts':v['step_counts']})
 
 		data = sorted(data, key=lambda user_info: user_info['total_steps'], reverse=True)
-		print data
 		return data

@@ -21,9 +21,7 @@ class fitbit_db:
 				name=row[1],
 				key=row[3],
 				secret=row[4]) for row in rows]
-		print users
 		return users
-
 
 	def update_steps (self, user_id, day, steps):
 		update_str = """ INSERT OR REPLACE INTO fitbit_steps
@@ -33,7 +31,7 @@ class fitbit_db:
 
 	def get_week (self):
 		week = date.today()-timedelta(days=7)
-		print week
+
 
 		q = """SELECT users.username, fitbit_steps.day, fitbit_steps.steps
 		       FROM users
@@ -44,7 +42,6 @@ class fitbit_db:
 		""".format(week)
 		ret = self.db.execute(q)
 		week_data = ret.fetchall()
-		print week_data
 
 		return week_data
 

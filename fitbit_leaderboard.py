@@ -19,7 +19,7 @@ DEBUG = True
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
 PASSWORD = 'sharedspace'
-REQUESTS_PER_DAY = 2000	# Fitbit API limits to 2000 requests per day
+REQUESTS_PER_DAY = 2000.0	# Fitbit API limits to 2000 requests per day
 CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
 CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
 
@@ -39,10 +39,14 @@ def update_fitbit ():
 		uffm = fitbit_manager.fitbit_manager()
 		uffm.update(db=db)
 
-		MINUTES = 24 * 60.
+		MINUTES = 24.0 * 60.0
 		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
 		rate *= 2	# Halve request rate as a saftey margin
 		db.close()
+		print "Sleep Info"
+		print rate
+		print "Current Time"
+		print str(datetime.now())
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
