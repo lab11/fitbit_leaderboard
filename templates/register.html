@@ -1,13 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<p> Step One: Visit The Following URL and authorize this appliction </p>
-<p> {{fitbit_auth_url}} </p>
+<p> Please enter the username to be displayed on the leaderboard </p>
 
-<p> Step Two: Fill in the user key and submit it </p>
-
-<form name="fitbit_user_key_form" action="/registered" method="Post" >
-	Fitbit Key <input type="text" name="fitbit_verifier"> <br>
+<form name="fitbit_user_key_form" action="/fitbit_register" method="Post" >
 	Username <input type="text" name="username"> <br>
 	<input type="submit" value="Submit">
 </form>

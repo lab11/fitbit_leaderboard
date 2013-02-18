@@ -75,15 +75,26 @@ def home():
 @app.route('/register')
 def register():
 	oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
-	request_token = oauth_fitbit.client.fetch_request_token()
+	request_token = oauth_fitbit.client.fetch_request_token(parameters={'oauth_callback':'http://nuclear.eecs.umich.edu/registered'})
 	fitbit_auth_url = oauth_fitbit.client.authorize_token_url(request_token)
 	response = make_response( render_template('register.html', fitbit_auth_url=fitbit_auth_url) )
+	response.set_cookie('fitbit_auth_url', fitbit_auth_url)
 	response.set_cookie('request_token_key', request_token.key)
 	response.set_cookie('request_token_secret', request_token.secret)
 	return response
 
+@app.route('/fitbit_register', methods=["POST"])
+def fitbit_register(): 
+	if request.method == "POST":
+		response = make_response(redirect(request.cookies.get('fitbit_auth_url')))
+		response.set_cookie('username', request.form['username'])
+		return response
+	else: 
+		return "Method error. Need Post"
+
 @app.route("/registered", methods=["GET", "POST"])
 def registered():
+	return str(request.form)
 	if request.method == "POST":
 		if not request.form['username']:
 			return 'You must enter a username'
@@ -100,7 +111,7 @@ def registered():
 			g.db.add_user(request.form['username'], request.form['fitbit_verifier'], user_token.key, user_token.secret)
 		return render_template('registered.html')
 	else:
-		return "Method error"
+		return "Method error. Need post"
 
 @app.route("/group_info")
 def group_info():
