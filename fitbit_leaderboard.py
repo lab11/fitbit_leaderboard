@@ -32,6 +32,8 @@ fm = fitbit_manager.fitbit_manager()
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
 
+g.link_root = "/fitbit"
+
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
