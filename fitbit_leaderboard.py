@@ -35,6 +35,7 @@ fm.update(db=db, number_of_days=7)
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
+		print "Fitbit Online Update"
 		db = fitbit_db.fitbit_db('fitbit.db')
 		uffm = fitbit_manager.fitbit_manager()
 		uffm.update(db=db)
@@ -107,4 +108,4 @@ def leaderboard():
 	return render_template('leaderboard.html', data=data)
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run()
