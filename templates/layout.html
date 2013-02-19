@@ -24,9 +24,7 @@
     <script>
       $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
     </script>
-    <div class="container">
-      {% block content scoped %}
-      {% endblock %}
-    </div>
+    {% block content scoped %}
+    {% endblock %}
   </body>
 </html>
