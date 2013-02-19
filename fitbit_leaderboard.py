@@ -7,7 +7,7 @@ from threading import Timer
 import time
 from math import ceil
 
-from flask import Flask, render_template, request, g, make_response, jsonify
+from flask import Flask, render_template, request, g, make_response, redirect
 import fitbit
 
 from db import fitbit_db
@@ -15,7 +15,7 @@ import fitbit_manager
 
 #config
 DATABASE = '/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db'
-DEBUG = True
+DEBUG = False
 SECRET_KEY = 'dev key'
 USERNAME = 'admin'
 PASSWORD = 'sharedspace'
@@ -85,8 +85,6 @@ def register():
 
 @app.route('/fitbit_register', methods=["POST", "GET"])
 def fitbit_register(): 
-	return redirect('www.google.com')
-	return str(request.cookies.get('fitbit_auth_url'))
 	if request.method == "POST":
 		response = make_response(redirect(request.cookies.get('fitbit_auth_url')))
 		response.set_cookie('username', request.form['username'])
@@ -98,9 +96,9 @@ def fitbit_register():
 def registered():
 	return str(request.form)
 	if request.method == "POST":
-		if not request.form['username']:
+		if not request.cookies.get['username']:
 			return 'You must enter a username'
-		elif not request.form['fitbit_verifier']:
+		elif not request.form['verifier']:
 			return 'You must enter a fitbit verifier'
 		elif not request.cookies.get('request_token_key'):
 			return "No request token key"
