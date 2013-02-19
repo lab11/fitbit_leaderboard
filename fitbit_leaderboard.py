@@ -83,8 +83,10 @@ def register():
 	response.set_cookie('request_token_secret', request_token.secret)
 	return response
 
-@app.route('/fitbit_register', methods=["POST"])
+@app.route('/fitbit_register', methods=["POST", "GET"])
 def fitbit_register(): 
+	return redirect('www.google.com')
+	return str(request.cookies.get('fitbit_auth_url'))
 	if request.method == "POST":
 		response = make_response(redirect(request.cookies.get('fitbit_auth_url')))
 		response.set_cookie('username', request.form['username'])
