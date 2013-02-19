@@ -75,12 +75,11 @@ def home():
 @app.route('/register')
 def register():
 	oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
-	request_token = oauth_fitbit.client.fetch_request_token(parameters={'oauth_callback':'http://nuclear.eecs.umich.edu/registered'})
+	request_token = oauth_fitbit.client.fetch_request_token(parameters={'oauth_callback':'http://nuclear.eecs.umich.edu/fitbit/registered'})
 	fitbit_auth_url = oauth_fitbit.client.authorize_token_url(request_token)
 	response = make_response( render_template('register.html', fitbit_auth_url=fitbit_auth_url) )
 	response.set_cookie('fitbit_auth_url', fitbit_auth_url)
-	response.set_cookie('request_token_key', request_token.key)
-	response.set_cookie('request_token_secret', request_token.secret)
+	response.set_cookie('oauth_secret', request_token.secret)
 	return response
 
 @app.route('/fitbit_register', methods=["POST", "GET"])
@@ -94,24 +93,20 @@ def fitbit_register():
 
 @app.route("/registered", methods=["GET", "POST"])
 def registered():
-	return str(request.form)
-	if request.method == "POST":
-		if not request.cookies.get['username']:
-			return 'You must enter a username'
-		elif not request.form['verifier']:
-			return 'You must enter a fitbit verifier'
-		elif not request.cookies.get('request_token_key'):
-			return "No request token key"
-		elif not request.cookies.get('request_token_secret'):
-			return "No request token secret"
-		else:
-			oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
-			request_token = oauth.Token(request.cookies.get('request_token_key'), request.cookies.get('request_token_secret'))
-			user_token = oauth_fitbit.client.fetch_access_token(request_token, request.form['fitbit_verifier'])
-			g.db.add_user(request.form['username'], request.form['fitbit_verifier'], user_token.key, user_token.secret)
-		return render_template('registered.html')
+	if not request.cookies.get('username'):
+		return 'You must enter a username'
+	elif not request.cookies.get('oauth_secret'):
+		return 'No request secret found' 
+	elif not request.args.get('oauth_token'):
+		return "No request token"
+	elif not request.args.get('oauth_verifier'):
+		return "No verifier"
 	else:
-		return "Method error. Need post"
+		oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
+		request_token = oauth.Token(request.args.get('oauth_token'), request.cookies.get('oauth_secret'))
+		user_token = oauth_fitbit.client.fetch_access_token(request_token, request.args.get('oauth_verifier'))
+		g.db.add_user(request.cookies.get('username'), request.args.get('oauth_verifier'), user_token.key, user_token.secret)
+	return render_template('registered.html')
 
 @app.route("/group_info")
 def group_info():
