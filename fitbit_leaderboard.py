@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from contextlib import closing
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 from threading import Timer
 import time
@@ -22,13 +22,19 @@ fm = fitbit_manager.fitbit_manager()
 fm.update(db=db, number_of_days=7)
 fm.update_all_meta(db=db)
 
+current_date = date.today() - timedelta(days=1)
+
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
 		print "Fitbit Online Update"
 		db = fitbit_db.fitbit_db(app.config['DATABASE'])
 		uffm = fitbit_manager.fitbit_manager()
-		uffm.update(db=db)
+		if date.today() > current_date:
+			uffm.update(db=db, number_of_days=2)
+			current_date = date.today()
+		else:
+			uffm.update(db=db)
 
 		minutes = 24.0 * 60.0
 		rate = ceil((app.config['REQUESTS_PER_DAY'] / minutes) * len(db.get_users()))
