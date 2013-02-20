@@ -104,8 +104,9 @@ function getInfoAndRender() {
 
 function updateLeaderBoard(data) {
   console.log(data);
-  var xNew = xScale.domain(data.map(function(d){return d.username})).copy();
-  var yNew = yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]).copy();
+  xScale.domain(data.map(function(d){return d.username}));
+  xScale..rangeRoundBands([0, width], .1);
+  yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
   var step_array = []
 
   data.forEach(function(d) {
