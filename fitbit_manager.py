@@ -131,5 +131,7 @@ class fitbit_manager:
 
 		for user in users:
 			meta = self.get_user_fitbit_info(user['key'], user['secret'])
+			if meta == None:
+				continue
 			db.add_meta(user['id'], meta)
 
