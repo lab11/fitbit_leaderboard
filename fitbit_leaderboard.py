@@ -13,7 +13,7 @@ from db import fitbit_db
 import fitbit_manager
 
 app = Flask(__name__)
-app.config.from_envvar('FL_CONFIG')
+app.config.from_object('fl_config')
 
 db = fitbit_db.fitbit_db(app.config['DATABASE'])
 fm = fitbit_manager.fitbit_manager()
