@@ -54,6 +54,9 @@ class fitbit_db:
 
 	# Add or update user meta information to the meta table
 	def add_meta (self, user_id, meta):
+		if meta is None:
+			return
+
 		q = """SELECT *
 		       FROM {0}user_meta
 		       WHERE user_id=?

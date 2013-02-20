@@ -5,7 +5,7 @@ import oauth2 as oauth
 CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
 CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
 
-CALLBACK_URL = 'http://127.0.0.1:5000/registered_data'
+CALLBACK_URL = 'http://nuclear.eecs.umich.edu/fitbit/registered_data'
 
 day_converter = {
 	0: 'm',
