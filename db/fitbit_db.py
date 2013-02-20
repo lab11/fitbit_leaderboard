@@ -142,7 +142,7 @@ class fitbit_db:
 		       LEFT JOIN {0}user_meta as um
 		       ON u.id = um.user_id
 		       WHERE s.day>?
-		       ORDER BY s.day DESC
+		       ORDER BY s.day ASC
 		""".format(TABLE_PREFIX)
 		print q
 		ret = self.db.execute(q, (week,))
