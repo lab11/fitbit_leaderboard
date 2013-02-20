@@ -84,7 +84,7 @@ def registered_data():
 	            verifier=request.args.get('oauth_verifier'),
 	            meta=reg_info)
 
-	return make_response(redirect('/registered'))
+	return make_response(redirect('/fitbit/registered'))
 
 @app.route("/registered")
 def registered():
