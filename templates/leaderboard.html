@@ -69,6 +69,27 @@ var cScale = d3.scale.ordinal()
   .domain(["m", "t", "w", "th", "f", "s", "sun"])
   .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", "#B7BF10", "#FFC72C", "#F6D565"]);
 
+var legend = svg.selectAll(".legend")
+  .data(cScale.domain())
+  .enter()
+
+legend.append("rect")
+  .attr("x", width - 18)
+  .attr("y", function(d,i){return i * 20})
+  .attr("width", 18)
+  .attr("height", 18)
+  .attr("vertical-align", "top")
+  .style("fill", function(d){return cScale(d)});
+
+legend.append("text")
+  .attr("x", width - 24)
+  .attr("y", function(d,i){return i * 20})
+  .attr("transform", function(d){ return "translate(0,9)" })
+  .style("text-anchor", "end")
+  .style("vertical-align", "middle")
+  .style("font-size", 12)
+  .text(function(d){ return d; });
+
 getInfoAndRender();
 
 // Run our leaderboard on a loop, updating every 10 seconds

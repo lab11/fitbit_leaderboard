@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import date, timedelta
 
-
+TABLE_PREFIX = "fitbit_lb_"
 
 class fitbit_db:
 
@@ -9,37 +9,143 @@ class fitbit_db:
 		self.db_name = db_name
 		self.db      = sqlite3.connect(db_name)
 
-	def add_user (self, username, verify_str, user_key, user_secret):
-		user = ((username, verify_str, user_key, user_secret))
-		self.db.execute("INSERT INTO users VALUES(NULL, ?, ?, ?, ?)", user)
+	# Save the temporary oauth secret in the database
+	def store_oauth_secret (self, key, secret):
+		q = """INSERT INTO {0}fitbit_oauth
+		       VALUES(NULL, ?, ?, NULL)
+		    """.format(TABLE_PREFIX)
+		self.db.execute(q, ((key, secret)))
 		self.db.commit()
 
+	# Retreive the temporary secret that is associated with a given token
+	def get_oauth_secret (self, token):
+		print "token: {0}".format(token)
+		q = """SELECT oauth_secret
+		       FROM {0}fitbit_oauth
+		       WHERE oauth_token = ?
+		    """.format(TABLE_PREFIX)
+		cur = self.db.execute(q, (token,))
+		row = cur.fetchone()
+		if not row:
+			print "Nothing retreived"
+		return row[0]
+
+	# Add a user after registration to the database. Adds the keys and the
+	# meta information.
+	def add_user (self, fitbit_id, key, secret, meta=None):
+		print "ADD USER: key {0}, secret {1}".format(key, secret)
+		# Check if user is already in database
+		user_id = self.get_user_id(fitbit_id)
+		if user_id:
+			q = """UPDATE {0}users
+			       SET fitbit_user_key=?, fitbit_user_secret=?
+			       WHERE id=?
+			    """.format(TABLE_PREFIX)
+			self.db.execute(q, ((key, secret, user_id)))
+		else:
+			q = """INSERT INTO {0}users
+			       VALUES(NULL, ?, ?, ?)
+			    """.format(TABLE_PREFIX)
+			cur = self.db.execute(q, ((fitbit_id, key, secret)))
+			user_id = cur.lastrowid
+
+		self.add_meta(user_id, meta)
+		self.db.commit()
+
+	# Add or update user meta information to the meta table
+	def add_meta (self, user_id, meta):
+		if meta is None:
+			return
+
+		q = """SELECT *
+		       FROM {0}user_meta
+		       WHERE user_id=?
+		    """.format(TABLE_PREFIX)
+		cur = self.db.execute(q, (user_id,))
+		row = cur.fetchone()
+
+		if row:
+			m = (meta.setdefault('username', row[2]),
+				 meta.setdefault('displayName', row[3]),
+				 meta.setdefault('nickname', row[4]),
+				 meta.setdefault('fullName', row[5]),
+				 meta.setdefault('avatar', row[6]),
+				 row[0]
+				)
+			q = """UPDATE {0}user_meta
+			       SET username=?, display_name=?, nickname=?,
+			       full_name=?, avatar=?
+			       WHERE id=?
+			    """.format(TABLE_PREFIX)
+			self.db.execute(q, m)
+		else:
+			m = (user_id,
+				 meta.setdefault('username'),
+				 meta.setdefault('displayName'),
+				 meta.setdefault('nickname'),
+				 meta.setdefault('fullName'),
+				 meta.setdefault('avatar'),
+				)
+			q = """INSERT INTO {0}user_meta
+			       VALUES(NULL, ?, ?, ?, ?, ?, ?)
+			    """.format(TABLE_PREFIX)
+			self.db.execute(q, m)
+
+		self.db.commit()
+
+	# Get our version of the user id from the id that fitbit uses.
+	# Returns None if the user is not in our database.
+	def get_user_id (self, fitbit_id):
+		q = """SELECT id FROM {0}users
+		       WHERE fitbit_id = ?
+		    """.format(TABLE_PREFIX)
+		cur = self.db.execute(q, (fitbit_id,))
+		row = cur.fetchone()
+		if row:
+			return row[0]
+		return None
+
+	# Returns a list of dicts of the keys for all users in our database.
+	# ret = {'id': our user id for the user
+	#        'fitbit_id': fitbit's id for the user
+	#        'key': oauth key
+	#        'secret': oauth_secret
+	#       }
 	def get_users (self):
-		cur = self.db.execute("SELECT * FROM users")
+		q = """SELECT * FROM {0}users
+		    """.format(TABLE_PREFIX)
+		cur = self.db.execute(q)
 		rows = cur.fetchall()
 		users = [dict(id=row[0],
-				name=row[1],
-				key=row[3],
-				secret=row[4]) for row in rows]
+				fitbit_id=row[1],
+				key=row[2],
+				secret=row[3]) for row in rows]
 		return users
 
+	# Set a new step value in the database.
+	# day = 'yyyy-mm-dd'
 	def update_steps (self, user_id, day, steps):
-		update_str = """ INSERT OR REPLACE INTO fitbit_steps
-		                 VALUES(NULL, ?, ?, ?)"""
-		self.db.execute(update_str, (user_id, day, steps))
+		q = """INSERT OR REPLACE INTO {0}steps
+		       VALUES(NULL, ?, ?, ?)
+		    """.format(TABLE_PREFIX)
+		self.db.execute(q, (user_id, day, steps))
 		self.db.commit()
 
+	# Get a week's worth of data from the database
 	def get_week (self):
 		week = date.today()-timedelta(days=7)
 
-		q = """SELECT users.username, fitbit_steps.day, fitbit_steps.steps
-		       FROM users
-		       LEFT JOIN fitbit_steps
-		       ON users.id = fitbit_steps.user_id
-		       WHERE fitbit_steps.day>'{0}'
-		       ORDER BY day DESC
-		""".format(week)
-		ret = self.db.execute(q)
+		q = """SELECT um.display_name, s.day, s.steps
+		       FROM {0}users as u
+		       LEFT JOIN {0}steps as s
+		       ON u.id = s.user_id
+		       LEFT JOIN {0}user_meta as um
+		       ON u.id = um.user_id
+		       WHERE s.day>?
+		       ORDER BY s.day DESC
+		""".format(TABLE_PREFIX)
+		print q
+		ret = self.db.execute(q, (week,))
 		week_data = ret.fetchall()
 
 		return week_data

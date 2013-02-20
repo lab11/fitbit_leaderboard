@@ -13,7 +13,6 @@ SECRET_KEY = 'super secret'
 USERNAME = 'admin'
 PASSWORD = 'super random'
 
-
 """
 We can also load in our own custom configuration values. Again, only all 
 caps variables are read in. 
