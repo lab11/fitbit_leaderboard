@@ -29,6 +29,7 @@ fm = fitbit_manager.fitbit_manager()
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
+fm.update_all_meta(db=db)
 
 
 # Start the periodic event to query fitbit
@@ -84,8 +85,8 @@ def fitbit_register():
 	else:
 		return "Method error. Need Post"
 
-@app.route("/registered", methods=["GET", "POST"])
-def registered():
+@app.route("/registered_data", methods=["GET", "POST"])
+def registered_data():
 	reg_info = request.cookies.get('register_info')
 	if reg_info != None:
 		reg_info = json.loads(reg_info)
@@ -97,6 +98,10 @@ def registered():
 	            verifier=request.args.get('oauth_verifier'),
 	            meta=reg_info)
 
+	return make_response(redirect('/registered'))
+
+@app.route("/registered")
+def registered():
 	return render_template('registered.html')
 
 @app.route("/group_info")
@@ -108,11 +113,6 @@ def group_info():
 def leaderboard():
 	data = fm.retrieve(db=g.db)
 	return render_template('leaderboard.html', data=data)
-
-@app.route("/test")
-def leaderboard():
-	data = fm.test_user(db=g.db)
-	return "heyo"
 
 if __name__ == '__main__':
 	app.run(debug=True)
