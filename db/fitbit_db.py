@@ -144,10 +144,8 @@ class fitbit_db:
 		       WHERE s.day>?
 		       ORDER BY s.day ASC
 		""".format(TABLE_PREFIX)
-		print q
 		ret = self.db.execute(q, (week,))
 		week_data = ret.fetchall()
-
 		return week_data
 
 	def close (self):

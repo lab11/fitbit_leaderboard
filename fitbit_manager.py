@@ -96,8 +96,6 @@ class fitbit_manager:
 
 		users = {}
 
-		print week_data
-
 		for item in week_data:
 			username = item[0]
 			mdate    = datetime.strptime(item[1], "%Y-%m-%d")
