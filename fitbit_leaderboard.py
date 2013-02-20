@@ -1,8 +1,10 @@
 from __future__ import with_statement
+from uwsgidecorators import *
 from contextlib import closing
 from datetime import datetime, date, timedelta
 import json
 from threading import Timer
+import threading
 import time
 from math import ceil
 
@@ -22,33 +24,69 @@ fm = fitbit_manager.fitbit_manager()
 fm.update(db=db, number_of_days=7)
 fm.update_all_meta(db=db)
 
-current_date = date.today() - timedelta(days=1)
-
+print "main thread {0}".format(threading.current_thread())
+"""
 # Start the periodic event to query fitbit
+@postfork
+@thread
 def update_fitbit ():
+	from datetime import datetime, date, timedelta
+	from math import ceil
+	import time
+	from db import fitbit_db
+	import fitbit_manager
+	import threading
+	
+	current_date = date.today() - timedelta(days=1)
+	while True:
+		print "Fitbit Online Update"
+		db = fitbit_db.fitbit_db('/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db')
+		uffm = fitbit_manager.fitbit_manager()
+		if date.today() > current_date:
+			uffm.update(db=db, number_of_days=7)
+			current_date = date.today()
+		else:
+			uffm.update(db=db)
+
+		minutes = 24.0 * 60.0
+		rate = ceil((2000 / minutes) * len(db.get_users()))
+		rate *= 2	# Halve request rate as a saftey margin
+		db.close()
+		print "Sleep Info. rate: {0}, current time: {1}".format(rate, datetime.now())
+		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
+
+# Call the update function to start that thread
+update_fitbit()
+
+print "after new thread"
+"""
+
+
+
+
+def update_fitbit ():
+	current_date = date.today() - timedelta(days=1)
 	while True:
 		print "Fitbit Online Update"
 		db = fitbit_db.fitbit_db(app.config['DATABASE'])
 		uffm = fitbit_manager.fitbit_manager()
 		if date.today() > current_date:
-			uffm.update(db=db, number_of_days=2)
+			uffm.update(db=db, number_of_days=7)
 			current_date = date.today()
 		else:
 			uffm.update(db=db)
 
 		minutes = 24.0 * 60.0
 		rate = ceil((app.config['REQUESTS_PER_DAY'] / minutes) * len(db.get_users()))
-		rate *= 2	# Halve request rate as a saftey margin
+		rate += 3	# Reduce request rate as a saftey margin
 		db.close()
-		print "Sleep Info"
-		print rate
-		print "Current Time"
-		print str(datetime.now())
+		print "Sleep Info. rate: {0}, current time: {1}".format(rate, datetime.now())
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
 t.daemon = True
 t.start()
+
 
 @app.before_request
 def before_request():
