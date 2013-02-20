@@ -8,7 +8,7 @@ For complete documentation and a table of FLask's configuration variables, see
 http://flask.pocoo.org/docs/config/
 """
 DATABASE = 'fitbit.db' #make this a full path when in production
-DEBUG = False
+DEBUG = True
 SECRET_KEY = 'super secret'
 USERNAME = 'admin'
 PASSWORD = 'super random'
