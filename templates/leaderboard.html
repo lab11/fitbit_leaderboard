@@ -122,7 +122,7 @@ function updateLeaderBoard(data) {
   var font_adjuster = 22 - (22 % data.length)
   $(".x-axis").css("font-size", String(font_adjuster + "px"))
 
-  var user_steps = svg.selectAll("rect")
+  var user_steps = svg.selectAll(".step-bars")
   	.data( step_array )
 
   user_steps.transition()
@@ -134,6 +134,7 @@ function updateLeaderBoard(data) {
 
   user_steps.enter()
       .append("rect")
+      .attr("class", "step-bars")
       .attr("width", xScale.rangeBand())
       .attr("x", function(d){ return d.x })
       .attr("y", function(d){ return yScale(d.y1); })
