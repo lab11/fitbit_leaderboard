@@ -1,7 +1,6 @@
 from __future__ import with_statement
 from contextlib import closing
 from datetime import datetime, date
-import oauth2 as oauth
 import json
 from threading import Timer
 import time
@@ -20,8 +19,7 @@ SECRET_KEY = 'dev key'
 USERNAME = 'admin'
 PASSWORD = 'sharedspace'
 REQUESTS_PER_DAY = 2000.0	# Fitbit API limits to 2000 requests per day
-CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
-CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -74,38 +72,31 @@ def home():
 
 @app.route('/register')
 def register():
-	oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
-	request_token = oauth_fitbit.client.fetch_request_token(parameters={'oauth_callback':'http://nuclear.eecs.umich.edu/fitbit/registered'})
-	fitbit_auth_url = oauth_fitbit.client.authorize_token_url(request_token)
-	response = make_response( render_template('register.html', fitbit_auth_url=fitbit_auth_url) )
-	response.set_cookie('fitbit_auth_url', fitbit_auth_url)
-	response.set_cookie('oauth_secret', request_token.secret)
+	response = make_response(render_template('register.html'))
 	return response
 
 @app.route('/fitbit_register', methods=["POST", "GET"])
-def fitbit_register(): 
+def fitbit_register():
 	if request.method == "POST":
-		response = make_response(redirect(request.cookies.get('fitbit_auth_url')))
-		response.set_cookie('username', request.form['username'])
+		response = make_response(redirect(fm.get_auth_url(db=g.db)))
+		response.set_cookie('register_info', json.dumps(request.form))
 		return response
-	else: 
+	else:
 		return "Method error. Need Post"
 
 @app.route("/registered", methods=["GET", "POST"])
 def registered():
-	if not request.cookies.get('username'):
-		return 'You must enter a username'
-	elif not request.cookies.get('oauth_secret'):
-		return 'No request secret found' 
-	elif not request.args.get('oauth_token'):
-		return "No request token"
-	elif not request.args.get('oauth_verifier'):
-		return "No verifier"
-	else:
-		oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
-		request_token = oauth.Token(request.args.get('oauth_token'), request.cookies.get('oauth_secret'))
-		user_token = oauth_fitbit.client.fetch_access_token(request_token, request.args.get('oauth_verifier'))
-		g.db.add_user(request.cookies.get('username'), request.args.get('oauth_verifier'), user_token.key, user_token.secret)
+	reg_info = request.cookies.get('register_info')
+	if reg_info != None:
+		reg_info = json.loads(reg_info)
+
+	print reg_info
+
+	fm.add_user(db=g.db,
+	            token=request.args.get('oauth_token'),
+	            verifier=request.args.get('oauth_verifier'),
+	            meta=reg_info)
+
 	return render_template('registered.html')
 
 @app.route("/group_info")
@@ -118,5 +109,10 @@ def leaderboard():
 	data = fm.retrieve(db=g.db)
 	return render_template('leaderboard.html', data=data)
 
+@app.route("/test")
+def leaderboard():
+	data = fm.test_user(db=g.db)
+	return "heyo"
+
 if __name__ == '__main__':
-	app.run()
+	app.run(debug=True)
