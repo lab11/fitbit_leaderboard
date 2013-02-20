@@ -106,4 +106,4 @@ def leaderboard():
 	return render_template('leaderboard.html', data=data)
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run()
