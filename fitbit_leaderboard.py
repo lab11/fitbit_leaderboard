@@ -13,36 +13,25 @@ import fitbit
 from db import fitbit_db
 import fitbit_manager
 
-#config
-DATABASE = '/home/wwhuang/git_repos/fitbit_leaderboard/fitbit.db'
-DEBUG = False
-SECRET_KEY = 'dev key'
-USERNAME = 'admin'
-PASSWORD = 'sharedspace'
-REQUESTS_PER_DAY = 2000.0	# Fitbit API limits to 2000 requests per day
-CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
-CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
-
 app = Flask(__name__)
-app.config.from_object(__name__)
+app.config.from_envvar('FL_CONFIG')
 
-db = fitbit_db.fitbit_db(DATABASE)
+db = fitbit_db.fitbit_db(app.config['DATABASE'])
 fm = fitbit_manager.fitbit_manager()
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
 
-
 # Start the periodic event to query fitbit
 def update_fitbit ():
 	while True:
 		print "Fitbit Online Update"
-		db = fitbit_db.fitbit_db(DATABASE)
+		db = fitbit_db.fitbit_db(app.config['DATABASE'])
 		uffm = fitbit_manager.fitbit_manager()
 		uffm.update(db=db)
 
-		MINUTES = 24.0 * 60.0
-		rate = ceil((REQUESTS_PER_DAY / MINUTES) * len(db.get_users()))
+		minutes = 24.0 * 60.0
+		rate = ceil((app.config['REQUESTS_PER_DAY'] / minutes) * len(db.get_users()))
 		rate *= 2	# Halve request rate as a saftey margin
 		db.close()
 		print "Sleep Info"
@@ -57,16 +46,12 @@ t.start()
 
 @app.before_request
 def before_request():
-	g.db = fitbit_db.fitbit_db(DATABASE)
+	g.db = fitbit_db.fitbit_db(app.config['DATABASE'])
 
 @app.teardown_request
 def teardown_request(exception):
 	if hasattr(g, 'db'):
 		g.db.close()
-
-@app.route('/fitbit')
-def fittest():
-	return "hello"
 
 @app.route('/')
 def home():
