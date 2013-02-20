@@ -105,7 +105,7 @@ function getInfoAndRender() {
 function updateLeaderBoard(data) {
   console.log(data);
   xScale.domain(data.map(function(d){return d.username}));
-  xScale..rangeRoundBands([0, width], .1);
+  xScale.rangeRoundBands([0, width], .1);
   yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
   var step_array = []
 
