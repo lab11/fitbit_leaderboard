@@ -34,7 +34,7 @@ var svg = d3.select("#cse-leaderboard").append("svg")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var xScale = d3.scale.ordinal()
-  .rangeRoundBands([0, width], .1);
+  .rangeRoundBands([3, width], .1);
 
 var yScale = d3.scale.linear()
   .rangeRound([height, 0]);
@@ -59,8 +59,8 @@ svg.append("g")
   .attr("class", "y-axis")
   .call(yAxis)
   .append("text")
-    //.attr("transform", "rotate(-90)")
-    .attr("y", 6)
+    .attr("y", 3)
+    .attr("transform", "rotate(-90)")
     .attr("dy", ".71em")
     .style("text-anchor", "end")
     .text("Steps");
@@ -106,7 +106,7 @@ function getInfoAndRender() {
 function updateLeaderBoard(data) {
   console.log(data);
   xScale.domain(data.map(function(d){return d.username}));
-  xScale.rangeRoundBands([0, width], .1);
+  xScale.rangeRoundBands([3, width], .1);
   yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
   var step_array = []
 
