@@ -21,12 +21,13 @@
 
 <script>
 
-var margin = {top: 25, right: 15, bottom: 40, left: 60}
-var width = document.documentElement.clientWidth - margin.left - margin.right
-var height = document.documentElement.clientHeight - margin.top - margin.bottom - 60
+var margin = {top: 20, right: 0, bottom: 40, left: 60}
+var width = document.documentElement.clientWidth - margin.left - margin.right - 30
+var height = document.documentElement.clientHeight - margin.top - margin.bottom - 65
 
 // Set up d3 SVG
 var svg = d3.select("#cse-leaderboard").append("svg")
+  .attr("class", "leaderboard-svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
 .append("g")
@@ -58,7 +59,7 @@ svg.append("g")
   .attr("class", "y-axis")
   .call(yAxis)
   .append("text")
-    .attr("transform", "rotate(-90)")
+    //.attr("transform", "rotate(-90)")
     .attr("y", 6)
     .attr("dy", ".71em")
     .style("text-anchor", "end")
