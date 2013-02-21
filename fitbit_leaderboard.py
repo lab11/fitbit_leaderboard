@@ -17,7 +17,9 @@ app = Flask(__name__)
 app.config.from_object('fl_config')
 
 db = fitbit_db.fitbit_db(app.config['DATABASE'])
-fm = fitbit_manager.fitbit_manager()
+fm = fitbit_manager.fitbit_manager(consumer_key=app.config['CONSUMER_KEY'],
+                                   consumer_secret=app.config['CONSUMER_SECRET'],
+                                   callback_url=app.config['CALLBACK_URL'])
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)

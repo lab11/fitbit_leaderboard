@@ -2,11 +2,6 @@ from datetime import datetime
 import fitbit
 import oauth2 as oauth
 
-CONSUMER_KEY = '4f0defd304af44e9a6790b0087070313'
-CONSUMER_SECRET = '737d767bf5024fda928ea039d77e1098'
-
-CALLBACK_URL = 'http://nuclear.eecs.umich.edu/fitbit/registered_data'
-
 day_converter = {
 	0: 'm',
 	1: 't',
@@ -18,13 +13,15 @@ day_converter = {
 }
 
 class fitbit_manager:
-	def __init__ (self):
-		pass
+	def __init__ (self, consumer_key, consumer_secret, callback_url):
+		self.CONSUMER_KEY    = consumer_key
+		self.CONSUMER_SECRET = consumer_secret
+		self.CALLBACK_URL    = callback_url
 
 	# Start the process of connecting to fitbit
 	def get_auth_url (self, db):
-		parameters = {'oauth_callback': CALLBACK_URL}
-		oa = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
+		parameters = {'oauth_callback': self.CALLBACK_URL}
+		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
 		req_token = oa.client.fetch_request_token(parameters=parameters)
 		db.store_oauth_secret(key=req_token.key, secret=req_token.secret)
 		fitbit_auth_url = oa.client.authorize_token_url(req_token)
@@ -33,7 +30,7 @@ class fitbit_manager:
 	# After the user has approved this application to connect to their account
 	# run this to add the user to the database
 	def add_user (self, db, token, verifier, meta=None):
-		oa = fitbit.Fitbit(CONSUMER_KEY, CONSUMER_SECRET)
+		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
 		print "next token {0}".format(token)
 		secret = db.get_oauth_secret(token)
 		request_token = oauth.Token(token, secret)
@@ -53,8 +50,8 @@ class fitbit_manager:
 	# Get the user profile info from fitbit
 	def get_user_fitbit_info (self, key, secret):
 		try:
-			oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY,
-				                         CONSUMER_SECRET,
+			oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
+				                         self.CONSUMER_SECRET,
 				                         user_key=key,
 				                         user_secret=secret)
 			res = oauth_fitbit.user_profile_get()['user']
@@ -73,8 +70,8 @@ class fitbit_manager:
 			if fitbit_id != None and user['fitbit_id'] != fitbit_id:
 				continue
 			try:
-				oauth_fitbit = fitbit.Fitbit(CONSUMER_KEY,
-					                         CONSUMER_SECRET,
+				oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
+					                         self.CONSUMER_SECRET,
 					                         user_key=user['key'],
 					                         user_secret=user['secret'])
 				res = oauth_fitbit.time_series('activities/steps',
