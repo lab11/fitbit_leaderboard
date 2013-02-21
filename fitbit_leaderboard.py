@@ -1,5 +1,4 @@
 from __future__ import with_statement
-from uwsgidecorators import *
 from contextlib import closing
 from datetime import datetime, date, timedelta
 import json
