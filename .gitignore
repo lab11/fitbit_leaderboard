@@ -1,3 +1,7 @@
+fl_config.py
+static/img/users
+fitbit.db
+
 *.py[cod]
 
 # C extensions

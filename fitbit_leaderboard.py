@@ -17,11 +17,17 @@ app = Flask(__name__)
 app.config.from_object('fl_config')
 
 db = fitbit_db.fitbit_db(app.config['DATABASE'])
-fm = fitbit_manager.fitbit_manager()
+fm = fitbit_manager.fitbit_manager(
+	consumer_key=app.config['CONSUMER_KEY'],
+	consumer_secret=app.config['CONSUMER_SECRET'],
+	callback_url=app.config['CALLBACK_URL'],
+	user_img_location=app.config['USER_IMG_LOCATION'],
+	user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
 
 # Do an initial update to get a weeks worth of data at the least
 fm.update(db=db, number_of_days=7)
 fm.update_all_meta(db=db)
+fm.cache_images(db=db)
 
 
 def update_fitbit ():
@@ -29,7 +35,12 @@ def update_fitbit ():
 	while True:
 		print "Fitbit Online Update"
 		db = fitbit_db.fitbit_db(app.config['DATABASE'])
-		uffm = fitbit_manager.fitbit_manager()
+		uffm = fitbit_manager.fitbit_manager(
+			consumer_key=app.config['CONSUMER_KEY'],
+			consumer_secret=app.config['CONSUMER_SECRET'],
+			callback_url=app.config['CALLBACK_URL'],
+			user_img_location=app.config['USER_IMG_LOCATION'],
+			user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
 		if date.today() > current_date:
 			uffm.update(db=db, number_of_days=7)
 			current_date = date.today()
@@ -105,4 +116,4 @@ def leaderboard():
 	return render_template('leaderboard.html', data=data)
 
 if __name__ == '__main__':
-	app.run()
+	app.run(debug=True)
