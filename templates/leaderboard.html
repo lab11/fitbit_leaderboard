@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<style>
+<style type="text/css">
 .axis path,
 .axis line {
   fill: none;
@@ -15,13 +15,36 @@
 .x-axis path {
   display: none;
 }
+
+#leaderboard_title {
+  position: absolute;
+  top:5px;
+  left:50%;
+  min-width: 100px;
+  width: 20%;
+  border: 3px solid #699CC6;
+  background-color: #fff;
+  margin-left: -10%;
+  text-align: center;
+  color: #111;
+  height: 75px;
+  z-index: 1500;
+  font-size: 200%;
+  vertical-align: center;
+  padding-top: 25px;
+  /*border-radius: 15px;*/
+}
 </style>
+
+<div id="leaderboard_title">
+Weekly Steps Taken
+</div>
 
 <div id="cse-leaderboard"></div>
 
 <script>
 
-var margin = {top: 20, right: 0, bottom: 40, left: 60}
+var margin = {top: 90, right: 0, bottom: 40, left: 60}
 var width = document.documentElement.clientWidth - margin.left - margin.right - 30
 var height = document.documentElement.clientHeight - margin.top - margin.bottom - 65
 
@@ -67,7 +90,7 @@ svg.append("g")
 
 // Set up our days to color mapping
 var cScale = d3.scale.ordinal()
-  .domain(["m", "t", "w", "th", "f", "s", "sun"])
+  .domain(["m", "t", "w", "th", "f", "s", "su"])
   .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", "#B7BF10", "#FFC72C", "#F6D565"]);
 
 var legend = svg.selectAll(".legend")
@@ -98,7 +121,7 @@ var looper = setInterval(function(){getInfoAndRender()}, 10000)
 
 // Gets the data from the server, passes it to our D3 js
 function getInfoAndRender() {
-  $.getJSON( $SCRIPT_ROOT + {{link_root}} + 'group_info', function(data) {
+  $.getJSON( $SCRIPT_ROOT + '{{link_root}}' + 'group_info', function(data) {
     updateLeaderBoard(data);
   });
 }
