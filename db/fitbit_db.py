@@ -135,7 +135,7 @@ class fitbit_db:
 	def get_week (self):
 		week = date.today()-timedelta(days=7)
 
-		q = """SELECT um.display_name, s.day, s.steps
+		q = """SELECT um.display_name, s.day, s.steps, um.avatar
 		       FROM {0}users as u
 		       LEFT JOIN {0}steps as s
 		       ON u.id = s.user_id
@@ -147,6 +147,24 @@ class fitbit_db:
 		ret = self.db.execute(q, (week,))
 		week_data = ret.fetchall()
 		return week_data
+
+	# Returns a dict with all users' meta information
+	# {<user_id>: {'username':<uname>, ...}}
+	def get_users_meta (self):
+		q = """SELECT user_id, username, display_name,
+		       nickname, full_name, avatar
+		       FROM {0}user_meta
+		    """.format(TABLE_PREFIX)
+		cur = self.db.execute(q)
+		raw = cur.fetchall()
+		meta = {}
+		for u in raw:
+			meta[u[0]] = {'username': u[1],
+			              'display_name': u[2],
+			              'nickname': u[3],
+			              'full_name': u[4],
+			              'avatar': u[5]}
+		return meta
 
 	def close (self):
 		self.db.close()
