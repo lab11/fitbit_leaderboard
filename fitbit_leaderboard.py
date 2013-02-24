@@ -31,7 +31,6 @@ fm.cache_images(db=db)
 
 
 def update_fitbit ():
-	current_date = date.today() - timedelta(days=1)
 	while True:
 		print "Fitbit Online Update"
 		db = fitbit_db.fitbit_db(app.config['DATABASE'])
@@ -41,11 +40,7 @@ def update_fitbit ():
 			callback_url=app.config['CALLBACK_URL'],
 			user_img_location=app.config['USER_IMG_LOCATION'],
 			user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
-		if date.today() > current_date:
-			uffm.update(db=db, number_of_days=7)
-			current_date = date.today()
-		else:
-			uffm.update(db=db)
+		uffm.update(db=db, number_of_days=7)
 
 		minutes = 60.0
 		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * len(db.get_users()))
