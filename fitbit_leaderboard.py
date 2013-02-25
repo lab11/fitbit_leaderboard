@@ -20,7 +20,6 @@ db = fitbit_db.fitbit_db(app.config['DATABASE'])
 fm = fitbit_manager.fitbit_manager(
 	consumer_key=app.config['CONSUMER_KEY'],
 	consumer_secret=app.config['CONSUMER_SECRET'],
-	callback_url=app.config['CALLBACK_URL'],
 	user_img_location=app.config['USER_IMG_LOCATION'],
 	user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
 
@@ -37,16 +36,17 @@ def update_fitbit ():
 		uffm = fitbit_manager.fitbit_manager(
 			consumer_key=app.config['CONSUMER_KEY'],
 			consumer_secret=app.config['CONSUMER_SECRET'],
-			callback_url=app.config['CALLBACK_URL'],
 			user_img_location=app.config['USER_IMG_LOCATION'],
 			user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
 		uffm.update(db=db, number_of_days=7)
 
 		minutes = 60.0
-		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * len(db.get_users()))
+		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * \
+		            len(db.get_users()))
 		rate += 1	# Reduce request rate as a saftey margin
 		db.close()
-		print "Sleep Info. rate: {0}, current time: {1}".format(rate, datetime.now())
+		print "Sleep Info. rate: {0}, current time: {1}".format(rate,
+			datetime.now())
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
@@ -58,6 +58,16 @@ t.start()
 def before_request():
 	g.db = fitbit_db.fitbit_db(app.config['DATABASE'])
 
+	g.site_root = ''
+	if 'X-Script-Name' in request.headers:
+		g.site_root = request.headers['X-Script-Name']
+
+	g.host = 'localhost'
+	if 'Host' in request.headers:
+		g.host = request.headers['Host']
+
+	g.meta = {'root': g.site_root}
+
 @app.teardown_request
 def teardown_request(exception):
 	if hasattr(g, 'db'):
@@ -65,17 +75,20 @@ def teardown_request(exception):
 
 @app.route('/')
 def home():
-	return render_template('home.html')
+	return render_template('home.html', meta=g.meta)
 
 @app.route('/register')
 def register():
-	response = make_response(render_template('register.html'))
+	response = make_response(render_template('register.html', meta=g.meta))
 	return response
 
 @app.route('/fitbit_register', methods=["POST", "GET"])
 def fitbit_register():
 	if request.method == "POST":
-		response = make_response(redirect(fm.get_auth_url(db=g.db)))
+		response = make_response(redirect(fm.get_auth_url(db=g.db,
+			callback_url='http://{0}{1}{2}'.format(g.host,
+			                                      g.site_root,
+			                                      app.config['CALLBACK_URL']))))
 		response.set_cookie('register_info', json.dumps(request.form))
 		return response
 	else:
@@ -94,11 +107,11 @@ def registered_data():
 	            verifier=request.args.get('oauth_verifier'),
 	            meta=reg_info)
 
-	return make_response(redirect('/fitbit/registered'))
+	return make_response(redirect(g.site_root + '/registered'))
 
 @app.route("/registered")
 def registered():
-	return render_template('registered.html')
+	return render_template('registered.html', meta=g.meta)
 
 @app.route("/group_info")
 def group_info():
@@ -108,7 +121,7 @@ def group_info():
 @app.route("/leaderboard")
 def leaderboard():
 	data = fm.retrieve(db=g.db)
-	return render_template('leaderboard.html', data=data)
+	return render_template('leaderboard.html', data=data, meta=g.meta)
 
 if __name__ == '__main__':
 	app.run(debug=True)
