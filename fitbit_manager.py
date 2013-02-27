@@ -96,6 +96,11 @@ class fitbit_manager:
 				print e
 			except fitbit.exceptions.HTTPBadRequest as ex:
 				print ex
+			except ConnectionError as exc:
+				print "Could not connect to fitbit"
+				print exc
+			except Exception:
+				pass
 
 	# Returns the url for the image offset from the root of the application.
 	# avatar_url is the fitbit image url passed with the user profile data.
