@@ -21,10 +21,10 @@
   top:5px;
   left:50%;
   min-width: 100px;
-  width: 20%;
+  width: 30%;
   border: 3px solid #699CC6;
   background-color: #fff;
-  margin-left: -10%;
+  margin-left: -15%;
   text-align: center;
   color: #111;
   height: 75px;
@@ -121,7 +121,7 @@ var looper = setInterval(function(){getInfoAndRender()}, 10000)
 
 // Gets the data from the server, passes it to our D3 js
 function getInfoAndRender() {
-  $.getJSON( $SCRIPT_ROOT + '{{link_root}}' + 'group_info', function(data) {
+  $.getJSON("{{ meta.root }}/group_info", function(data) {
     updateLeaderBoard(data);
   });
 }
