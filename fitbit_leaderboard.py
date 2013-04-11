@@ -41,10 +41,12 @@ def update_fitbit ():
 		uffm.update(db=db, number_of_days=7)
 
 		minutes = 60.0
-		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * len(db.get_users()))
+		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * \
+		            len(db.get_users()))
 		rate += 1	# Reduce request rate as a saftey margin
 		db.close()
-		print "Sleep Info. rate: {0}, current time: {1}".format(rate, datetime.now())
+		print "Sleep Info. rate: {0}, current time: {1}".format(rate,
+			datetime.now())
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
 t = Timer(1, update_fitbit)
@@ -57,6 +59,16 @@ def before_request():
 	g.db = fitbit_db.fitbit_db(app.config['DATABASE'])
 	g.site_root = request.headers['X-Script-Name'] or ''
 	g.host = request.headers['Host'] or 'localhost'
+	g.meta = {'root': g.site_root}
+
+	g.site_root = ''
+	if 'X-Script-Name' in request.headers:
+		g.site_root = request.headers['X-Script-Name']
+
+	g.host = 'localhost'
+	if 'Host' in request.headers:
+		g.host = request.headers['Host']
+
 	g.meta = {'root': g.site_root}
 
 @app.teardown_request
@@ -77,7 +89,7 @@ def register():
 def fitbit_register():
 	if request.method == "POST":
 		response = make_response(redirect(fm.get_auth_url(db=g.db,
-			callback_url='http://' + g.host + g.site_root + app.config['CALLBACK_URL'])))
+			   callback_url='http://' + g.host + g.site_root + app.config['CALLBACK_URL'])))
 		response.set_cookie('register_info', json.dumps(request.form))
 		return response
 	else:

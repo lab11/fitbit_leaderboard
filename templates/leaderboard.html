@@ -128,9 +128,19 @@ function getInfoAndRender() {
 
 function updateLeaderBoard(data) {
   console.log(data);
-  xScale.domain(data.map(function(d){return d.username}));
-  xScale.rangeRoundBands([3, width], .1);
-  yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
+  var xScaleUpdater = d3.scale.ordinal()
+    .rangeRoundBands([3, width], .1);
+
+  var yScaleUpdater = d3.scale.linear()
+    .rangeRound([height, 0]);
+
+  xScaleUpdater.domain(data.map(function(d){return d.username}));
+  xScaleUpdater.rangeRoundBands([3, width], .1);
+  yScaleUpdater.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
+
+  xScale = xScaleUpdater;
+  yScale = yScaleUpdater;
+  
   var step_array = []
 
   data.forEach(function(d) {

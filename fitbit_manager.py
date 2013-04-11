@@ -96,9 +96,11 @@ class fitbit_manager:
 				print e
 			except fitbit.exceptions.HTTPBadRequest as ex:
 				print ex
+
 #			except ConnectionError as exc:
 #				print "Could not connect to fitbit"
 #				print exc
+
 			except Exception:
 				pass
 
