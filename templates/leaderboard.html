@@ -128,18 +128,10 @@ function getInfoAndRender() {
 
 function updateLeaderBoard(data) {
   console.log(data);
-  var xScaleUpdater = d3.scale.ordinal()
-    .rangeRoundBands([3, width], .1);
-
-  var yScaleUpdater = d3.scale.linear()
-    .rangeRound([height, 0]);
-
-  xScaleUpdater.domain(data.map(function(d){return d.username}));
-  xScaleUpdater.rangeRoundBands([3, width], .1);
-  yScaleUpdater.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
-
-  xScale = xScaleUpdater;
-  yScale = yScaleUpdater;
+  
+  xScale.domain(data.map(function(d){return d.username}))
+        .rangeRoundBands([3, width], .1);
+  yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
   
   var step_array = []
 
@@ -165,6 +157,7 @@ function updateLeaderBoard(data) {
       .attr("x", function(d){ return d.x })
       .attr("y", function(d){ return yScale(d.y1) })
       .attr("height", function(d){ return yScale(d.y0) - yScale(d.y1) })
+      .attr("width", xScale.rangeBand())
       .style("fill", function(d){ return cScale(d.day) });
 
   user_steps.enter()
