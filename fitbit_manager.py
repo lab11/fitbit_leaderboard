@@ -11,7 +11,7 @@ day_converter = {
 	3: 'th',
 	4: 'f',
 	5: 's',
-	6: 'sun'
+	6: 'su'
 }
 
 preffered_img_suffixes = ['_profile_125_square.jpg']
@@ -20,18 +20,16 @@ class fitbit_manager:
 	def __init__ (self,
 	              consumer_key,
 	              consumer_secret,
-	              callback_url,
 	              user_img_location,
 	              user_img_web_prefix):
 		self.CONSUMER_KEY    = consumer_key
 		self.CONSUMER_SECRET = consumer_secret
-		self.CALLBACK_URL    = callback_url
 		self.IMG_LOC         = user_img_location
 		self.IMG_WEB_PREFIX  = user_img_web_prefix
 
 	# Start the process of connecting to fitbit
-	def get_auth_url (self, db):
-		parameters = {'oauth_callback': self.CALLBACK_URL}
+	def get_auth_url (self, db, callback_url):
+		parameters = {'oauth_callback': callback_url}
 		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
 		req_token = oa.client.fetch_request_token(parameters=parameters)
 		db.store_oauth_secret(key=req_token.key, secret=req_token.secret)
@@ -98,6 +96,11 @@ class fitbit_manager:
 				print e
 			except fitbit.exceptions.HTTPBadRequest as ex:
 				print ex
+#			except ConnectionError as exc:
+#				print "Could not connect to fitbit"
+#				print exc
+			except Exception:
+				pass
 
 	# Returns the url for the image offset from the root of the application.
 	# avatar_url is the fitbit image url passed with the user profile data.
@@ -192,6 +195,6 @@ class fitbit_manager:
 					img.write(u.read())
 					img.close()
 					break
-				except:
+				except Exception as e:
 					pass
 
