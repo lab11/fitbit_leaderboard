@@ -36,17 +36,13 @@
 }
 </style>
 
-<div id="leaderboard_title">
-Weekly Steps Taken
-</div>
-
 <div id="cse-leaderboard"></div>
 
 <script>
 
-var margin = {top: 90, right: 0, bottom: 40, left: 60}
+var margin = {top: 30, right: 0, bottom: 40, left: 60}
 var width = document.documentElement.clientWidth - margin.left - margin.right - 30
-var height = document.documentElement.clientHeight - margin.top - margin.bottom - 65
+var height = document.documentElement.clientHeight - margin.top - margin.bottom - 90
 
 // Set up d3 SVG
 var svg = d3.select("#cse-leaderboard").append("svg")
@@ -56,11 +52,18 @@ var svg = d3.select("#cse-leaderboard").append("svg")
 .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+svg.append("text")
+   .attr("x", width/2)
+   .attr("y", 0)
+   .attr("text-anchor", "middle")
+   .style("font-size", "36px")
+   .text("Weekly Steps Taken");
+
 var xScale = d3.scale.ordinal()
   .rangeRoundBands([3, width], .1);
 
 var yScale = d3.scale.linear()
-  .rangeRound([height, 0]);
+  .rangeRound([height, 24]);
 
 var xAxis = d3.svg.axis()
   .scale(xScale)
@@ -83,6 +86,7 @@ svg.append("g")
   .call(yAxis)
   .append("text")
     .attr("y", 3)
+    .attr("x", -24)
     .attr("transform", "rotate(-90)")
     .attr("dy", ".71em")
     .style("text-anchor", "end")
@@ -110,7 +114,7 @@ var legend = svg.selectAll(".legend")
 legend.append("rect")
   .attr("class", "legend-rect")
   .attr("x", width - 18)
-  .attr("y", function(d,i){return i * 20})
+  .attr("y", function(d,i){return ((i * 20) + 24)})
   .attr("width", 18)
   .attr("height", 18)
   .attr("vertical-align", "top");
@@ -118,7 +122,7 @@ legend.append("rect")
 legend.append("text")
   .attr("class", "legend-text")
   .attr("x", width - 24)
-  .attr("y", function(d,i){return ( (i * 20) + 15 )  } )
+  .attr("y", function(d,i){return ( (i * 20) + 39 )  } )
   .style("text-anchor", "end")
   .style("vertical-align", "middle")
   .style("font-size", 12);
