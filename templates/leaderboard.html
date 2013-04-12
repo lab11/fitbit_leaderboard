@@ -144,7 +144,7 @@ function updateLeaderBoard(data) {
     current_week.push(i);
   }
 
-  for(var n = (current_day+1); n < 7; n++) {
+  for(var n = 6; n > current_day; n--) {
     current_week.push(n);
   }
 
