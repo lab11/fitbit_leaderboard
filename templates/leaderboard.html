@@ -91,28 +91,38 @@ svg.append("g")
 // Set up our days to color mapping
 var cScale = d3.scale.ordinal()
   .domain(["m", "t", "w", "th", "f", "s", "su"])
-  .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", "#B7BF10", "#FFC72C", "#F6D565"]);
+  .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", 
+          "#B7BF10", "#FFC72C", "#F6D565"]);
+
+var weekday_mapper = [];
+weekday_mapper[0] = 'su';
+weekday_mapper[1] = 'm';
+weekday_mapper[2] = 't';
+weekday_mapper[3] = 'w';
+weekday_mapper[4] = 'th';
+weekday_mapper[5] = 'f';
+weekday_mapper[6] = 's';
 
 var legend = svg.selectAll(".legend")
   .data(cScale.domain())
   .enter()
 
 legend.append("rect")
+  .attr("class", "legend-rect")
   .attr("x", width - 18)
   .attr("y", function(d,i){return i * 20})
   .attr("width", 18)
   .attr("height", 18)
-  .attr("vertical-align", "top")
-  .style("fill", function(d){return cScale(d)});
+  .attr("vertical-align", "top");
 
 legend.append("text")
+  .attr("class", "legend-text")
   .attr("x", width - 24)
   .attr("y", function(d,i){return i * 20})
   .attr("transform", function(d){ return "translate(0,9)" })
   .style("text-anchor", "end")
   .style("vertical-align", "middle")
-  .style("font-size", 12)
-  .text(function(d){ return d; });
+  .style("font-size", 12);
 
 getInfoAndRender();
 
@@ -127,6 +137,32 @@ function getInfoAndRender() {
 }
 
 function updateLeaderBoard(data) {
+  var m_date = new Date(); 
+  var current_day = m_date.getDay(); 
+  var current_week = [];
+
+  for(var i = current_day; i < 7; i++) {
+    current_week.push(i);
+  }
+
+  for(var n = 0; n < current_day; n++) {
+    current_week.push(n);
+  }
+
+  var legend_rects = svg.selectAll("legend_rect")
+                        .data(current_week);
+
+  legend_rects.transition()
+    .duration(750)
+    .style("fill", function(d){ return cScale(weekday_mapper[d]) });
+
+  var legend_text = svg.selectAll("legend_text")
+                       .data(current_week);
+
+  legend_text.transition()
+    .duration(750)
+    .text(function(d){ return weekday_mapper[d] });
+
   console.log(data);
   
   xScale.domain(data.map(function(d){return d.username}))
