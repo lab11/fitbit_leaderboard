@@ -118,8 +118,7 @@ legend.append("rect")
 legend.append("text")
   .attr("class", "legend-text")
   .attr("x", width - 24)
-  .attr("y", function(d,i){return i * 20})
-  .attr("transform", function(d){ return "translate(0,9)" })
+  .attr("y", function(d,i){return ( (i * 20) + 15 )  } )
   .style("text-anchor", "end")
   .style("vertical-align", "middle")
   .style("font-size", 12);
@@ -141,22 +140,22 @@ function updateLeaderBoard(data) {
   var current_day = m_date.getDay(); 
   var current_week = [];
 
-  for(var i = current_day; i < 7; i++) {
+  for(var i = current_day; i >= 0; i--) {
     current_week.push(i);
   }
 
-  for(var n = 0; n < current_day; n++) {
+  for(var n = (current_day+1); n < 7; n++) {
     current_week.push(n);
   }
 
-  var legend_rects = svg.selectAll("legend_rect")
+  var legend_rects = svg.selectAll(".legend-rect")
                         .data(current_week);
 
   legend_rects.transition()
     .duration(750)
     .style("fill", function(d){ return cScale(weekday_mapper[d]) });
 
-  var legend_text = svg.selectAll("legend_text")
+  var legend_text = svg.selectAll(".legend-text")
                        .data(current_week);
 
   legend_text.transition()
