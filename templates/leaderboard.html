@@ -53,8 +53,9 @@ var svg = d3.select("#cse-leaderboard").append("svg")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 svg.append("text")
+   .attr("class", "fitbit-leaderboard-title")
    .attr("x", width/2)
-   .attr("y", 0)
+   .attr("y", 10)
    .attr("text-anchor", "middle")
    .style("font-size", "36px")
    .text("Weekly Steps Taken");
