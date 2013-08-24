@@ -101,7 +101,8 @@ class fitbit_manager:
 #				print "Could not connect to fitbit"
 #				print exc
 
-			except Exception:
+			except Exception as exc:
+				print exc
 				pass
 
 	# Returns the url for the image offset from the root of the application.
@@ -152,6 +153,9 @@ class fitbit_manager:
 
 		data = []
 		for k,v in users.iteritems():
+			if v['total'] == 0:
+				# Skip users who don't have any steps for the week
+				continue
 			data.append({'username': k,
 			             'image': v['image'],
 				         'total_steps': v['total'],
