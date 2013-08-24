@@ -75,6 +75,15 @@ var yAxis = d3.svg.axis()
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
+var step_labels;
+var user_steps;
+var current_date;
+var current_day;
+var current_week;
+var legend_rects;
+var legend_text;
+var step_array;
+
 // Set up x axis positioning in svg
 svg.append("g")
 .attr("class", "x-axis")
@@ -96,7 +105,7 @@ svg.append("g")
 // Set up our days to color mapping
 var cScale = d3.scale.ordinal()
   .domain(["m", "t", "w", "th", "f", "s", "su"])
-  .range(["#212A55", "#3A5E8C", "#699CC6", "#679146", 
+  .range(["#212A55", "#3A5E8C", "#699CC6", "#679146",
           "#B7BF10", "#FFC72C", "#F6D565"]);
 
 var weekday_mapper = [];
@@ -141,9 +150,9 @@ function getInfoAndRender() {
 }
 
 function updateLeaderBoard(data) {
-  var m_date = new Date(); 
-  var current_day = m_date.getDay(); 
-  var current_week = [];
+  current_date = new Date();
+  current_day = current_date.getDay();
+  current_week = [];
 
   for(var i = current_day; i >= 0; i--) {
     current_week.push(i);
@@ -153,27 +162,25 @@ function updateLeaderBoard(data) {
     current_week.push(n);
   }
 
-  var legend_rects = svg.selectAll(".legend-rect")
+  legend_rects = svg.selectAll(".legend-rect")
                         .data(current_week);
 
   legend_rects.transition()
     .duration(750)
     .style("fill", function(d){ return cScale(weekday_mapper[d]) });
 
-  var legend_text = svg.selectAll(".legend-text")
+  legend_text = svg.selectAll(".legend-text")
                        .data(current_week);
 
   legend_text.transition()
     .duration(750)
     .text(function(d){ return weekday_mapper[d] });
 
-  console.log(data);
-  
   xScale.domain(data.map(function(d){return d.username}))
         .rangeRoundBands([3, width], .1);
   yScale.domain([0, d3.max(data, function(d){ return d.total_steps; } )]);
-  
-  var step_array = []
+
+  step_array = []
 
   data.forEach(function(d) {
     var y0 = 0;
@@ -186,10 +193,7 @@ function updateLeaderBoard(data) {
     });
   });
 
-  var font_adjuster = 22 - (22 % data.length)
-  $(".x-axis").css("font-size", String(font_adjuster + "px"))
-
-  var user_steps = svg.selectAll(".step-bars")
+  user_steps = svg.selectAll(".step-bars")
   	.data( step_array )
 
   user_steps.transition()
@@ -229,7 +233,7 @@ function updateLeaderBoard(data) {
     .duration(500)
     .call(yAxis);
 
-  var step_labels = svg.selectAll(".step-labels")
+  step_labels = svg.selectAll(".step-labels")
                       .data(data)
 
   step_labels.transition()
