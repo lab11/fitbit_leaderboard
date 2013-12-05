@@ -57,6 +57,9 @@ t.start()
 @app.before_request
 def before_request():
 	g.db = fitbit_db.fitbit_db(app.config['DATABASE'])
+	g.site_root = request.headers['X-Script-Name'] or ''
+	g.host = request.headers['Host'] or 'localhost'
+	g.meta = {'root': g.site_root}
 
 	g.site_root = ''
 	if 'X-Script-Name' in request.headers:
@@ -86,9 +89,7 @@ def register():
 def fitbit_register():
 	if request.method == "POST":
 		response = make_response(redirect(fm.get_auth_url(db=g.db,
-			callback_url='http://{0}{1}{2}'.format(g.host,
-			                                      g.site_root,
-			                                      app.config['CALLBACK_URL']))))
+			   callback_url='http://' + g.host + g.site_root + app.config['CALLBACK_URL'])))
 		response.set_cookie('register_info', json.dumps(request.form))
 		return response
 	else:
