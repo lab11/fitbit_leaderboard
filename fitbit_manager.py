@@ -131,26 +131,33 @@ class fitbit_manager:
 		users = {}
 
 		for item in week_data:
-			username = item[0]
-			mdate    = datetime.strptime(item[1], "%Y-%m-%d")
+			userid   = item[0]
+			username = item[1]
+			mdate    = datetime.strptime(item[2], "%Y-%m-%d")
 			day      = day_converter[mdate.weekday()]
-			steps    = item[2]
-			avatar   = self.get_avatar_relative_url(item[3])
+			steps    = item[3]
+			avatar   = self.get_avatar_relative_url(item[4])
 
 			if not username:
 				continue
 
-			users.setdefault(username, {})
-			users[username].setdefault('total', 0)
-			users[username]['total'] += steps
-			users[username]['image'] = avatar
+			users.setdefault(userid, {})
+			users[userid].setdefault('total', 0)
+			users[userid]['total'] += steps
+			users[userid]['image'] = avatar
+			users[userid]['username'] = username
 
-			users[username].setdefault('step_counts', [])
-			users[username]['step_counts'].append({'day':day, 'steps':steps})
+			users[userid].setdefault('step_counts', [])
+			users[userid]['step_counts'].append({'day':day, 'steps':steps})
 
 		data = []
 		for k,v in users.iteritems():
-			data.append({'username': k,
+			# Skip users who don't have any steps
+			if v['total'] == 0:
+				continue
+
+			data.append({'username': v['username'],
+			             'userid': k,
 			             'image': v['image'],
 				         'total_steps': v['total'],
 				         'step_counts': v['step_counts']})
