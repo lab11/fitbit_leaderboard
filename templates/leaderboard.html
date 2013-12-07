@@ -212,6 +212,7 @@ function updateLeaderBoard(data) {
   user_steps.enter()
       .append("rect")
       .attr("class", "step-bars")
+      .attr("steps", function(d){ return d.steps; })
       .attr("width", xScale.rangeBand())
       .attr("x", function(d){ return d.x })
       .attr("y", function(d){ return yScale(d.y1); })
@@ -264,6 +265,23 @@ function updateLeaderBoard(data) {
     .duration(750)
     .style("opacity", 0)
     .remove();
+
+  $('.step-bars').each(function() {
+    $(this).qtip({
+       content: { text: numberWithCommas($(this).attr("steps")) },
+       position: {my: 'center',
+                  at: 'bottom right',
+                  adjust: { x: $(this).attr("width")/2,
+                            y: $(this).attr("height")/2 } },
+       hide: { fixed: true },
+       style: { classes: 'qtip-light' }
+    });
+  });
+
+}
+
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 </script>
 
