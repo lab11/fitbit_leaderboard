@@ -194,8 +194,8 @@ function updateLeaderBoard(data) {
       daystep.x = xScale(d.userid)
       y0 = daystep.y1;
       step_array.push(daystep);
-      userid_mapping[d.userid] = d.username;
     });
+    userid_mapping[d.userid] = d.username;
   });
 
   user_steps = svg.selectAll(".step-bars")
