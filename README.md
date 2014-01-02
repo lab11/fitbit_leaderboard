@@ -28,6 +28,12 @@ Then simply:
 Run With nginx and uWsgi
 ------------------------
 
+nginx needs to be recompiled with the `more_set_input_headers` extension
+to use the following config script. This lets the python code know what
+prefix to use (for example '/fitbit') in the URLs in the HTML. The actual
+/fitbit is not included in the python paths so that the code is agnostic
+and could be used with any prefix (like '/fb') without changing any code.
+
 ### Example nginx conf file:
 
 	server {
