@@ -58,7 +58,6 @@ t.start()
 def before_request():
 	g.db = fitbit_db.fitbit_db(app.config['DATABASE'])
 	g.host = request.headers['Host'] or 'localhost'
-	g.meta = {'root': g.site_root}
 
 	g.site_root = ''
 	if 'X-Script-Name' in request.headers:
