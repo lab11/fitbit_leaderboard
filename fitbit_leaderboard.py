@@ -86,8 +86,9 @@ def register():
 @app.route('/fitbit_register', methods=["POST", "GET"])
 def fitbit_register():
 	if request.method == "POST":
-		response = make_response(redirect(fm.get_auth_url(db=g.db,
-			   callback_url='http://' + g.host + g.site_root + app.config['CALLBACK_URL'])))
+		auth_url = fm.get_auth_url(db=g.db,
+		  callback_url='http://' + g.host + g.site_root + app.config['CALLBACK_URL'])
+		response = make_response(redirect(auth_url))
 		response.set_cookie('register_info', json.dumps(request.form))
 		return response
 	else:
@@ -99,11 +100,8 @@ def registered_data():
 	if reg_info != None:
 		reg_info = json.loads(reg_info)
 
-	print reg_info
-
 	fm.add_user(db=g.db,
-	            token=request.args.get('oauth_token'),
-	            verifier=request.args.get('oauth_verifier'),
+	            verifier_pin=request.args.get('oauth_verifier'),
 	            meta=reg_info)
 
 	return make_response(redirect(g.site_root + '/registered'))
@@ -123,4 +121,4 @@ def leaderboard():
 	return render_template('leaderboard.html', data=data, meta=g.meta)
 
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(host='0.0.0.0', debug=True)

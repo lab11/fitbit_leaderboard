@@ -1,6 +1,6 @@
 from datetime import datetime
 import fitbit
-import oauth2 as oauth
+#import oauth2 as oauth
 import os
 import urllib2
 
@@ -29,30 +29,28 @@ class fitbit_manager:
 
 	# Start the process of connecting to fitbit
 	def get_auth_url (self, db, callback_url):
-		parameters = {'oauth_callback': callback_url}
-		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
-		req_token = oa.client.fetch_request_token(parameters=parameters)
-		db.store_oauth_secret(key=req_token.key, secret=req_token.secret)
-		fitbit_auth_url = oa.client.authorize_token_url(req_token)
-		return fitbit_auth_url
+		self.oa = fitbit.Fitbit(self.CONSUMER_KEY,
+		                        self.CONSUMER_SECRET,
+		                        callback_uri=callback_url)
+		self.oa.client.fetch_request_token()
+		return self.oa.client.authorize_token_url()
 
 	# After the user has approved this application to connect to their account
-	# run this to add the user to the database
-	def add_user (self, db, token, verifier, meta=None):
-		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
-		print "next token {0}".format(token)
-		secret = db.get_oauth_secret(token)
-		request_token = oauth.Token(token, secret)
-		user_token = oa.client.fetch_access_token(request_token, verifier)
+	# run this to add the user to the databasei
+	def add_user (self, db, verifier_pin, meta=None):
+		user_token = self.oa.client.fetch_access_token(verifier_pin)
 
-		u_info = self.get_user_fitbit_info(user_token.key, user_token.secret)
+		utoken = user_token['oauth_token']
+		usecret = user_token['oauth_token_secret']
+
+		u_info = self.get_user_fitbit_info(utoken, usecret)
 		if 'encodedId' not in u_info:
 			printf("Not a valid user info dict")
 			return
 		fitbit_id = u_info['encodedId']
 
 		u_info['username'] = meta.setdefault('username')
-		db.add_user(fitbit_id, user_token.key, user_token.secret, u_info)
+		db.add_user(fitbit_id, utoken, usecret, u_info)
 
 		self.update(db, number_of_days=7, fitbit_id=fitbit_id)
 		self.cache_images(db)
@@ -62,8 +60,8 @@ class fitbit_manager:
 		try:
 			oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
 				                         self.CONSUMER_SECRET,
-				                         user_key=key,
-				                         user_secret=secret)
+				                         resource_owner_key=key,
+				                         resource_owner_secret=secret)
 			res = oauth_fitbit.user_profile_get()['user']
 		except fitbit.exceptions.HTTPUnauthorized as e:
 			print "User keys invalid: {0} {1}".format(key, secret)
