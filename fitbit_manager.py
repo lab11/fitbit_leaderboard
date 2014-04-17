@@ -84,21 +84,21 @@ class fitbit_manager:
 				continue
 			try:
 				oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
-					                         self.CONSUMER_SECRET,
-					                         user_key=user['key'],
-					                         user_secret=user['secret'])
+								 self.CONSUMER_SECRET,
+								 resource_owner_key=user['key'],
+								 resource_owner_secret=user['secret'])
 				res = oauth_fitbit.time_series('activities/steps',
-					                       period='{0}d'.format(number_of_days))
+							       period='{0}d'.format(number_of_days))
 				userid = int(user['id'])
 				for item in res['activities-steps']:
 					day = item['dateTime']
 					steps = int(item['value'])
 
 					db.update_steps(userid, day, steps)
-			except fitbit.exceptions.HTTPUnauthorized as e:
-				print e
-			except fitbit.exceptions.HTTPBadRequest as ex:
-				print ex
+				except fitbit.exceptions.HTTPUnauthorized as e:
+					print e
+				except fitbit.exceptions.HTTPBadRequest as ex:
+					print ex
 
 #			except ConnectionError as exc:
 #				print "Could not connect to fitbit"
