@@ -38,11 +38,13 @@ class fitbit_manager:
 	# After the user has approved this application to connect to their account
 	# run this to add the user to the databasei
 	def add_user (self, db, verifier_pin, meta=None):
+		print('adding user')
 		user_token = self.oa.client.fetch_access_token(verifier_pin)
 
 		utoken = user_token['oauth_token']
 		usecret = user_token['oauth_token_secret']
 
+		print('got token')
 		u_info = self.get_user_fitbit_info(utoken, usecret)
 		if 'encodedId' not in u_info:
 			printf("Not a valid user info dict")
