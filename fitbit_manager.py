@@ -95,10 +95,10 @@ class fitbit_manager:
 					steps = int(item['value'])
 
 					db.update_steps(userid, day, steps)
-				except fitbit.exceptions.HTTPUnauthorized as e:
-					print e
-				except fitbit.exceptions.HTTPBadRequest as ex:
-					print ex
+			except fitbit.exceptions.HTTPUnauthorized as e:
+				print e
+			except fitbit.exceptions.HTTPBadRequest as ex:
+				print ex
 
 #			except ConnectionError as exc:
 #				print "Could not connect to fitbit"
