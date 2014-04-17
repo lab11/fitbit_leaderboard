@@ -103,9 +103,10 @@ def registered_data():
 	try:
 		fm.add_user(db=g.db,
 		            token=request.args.get('oauth_token'),
-		            verifier_pin=request.args.get('oauth_verifier'),
+		            verifier=request.args.get('oauth_verifier'),
 		            meta=reg_info)
 	except Exception as e:
+		print('EXCEPTION')
 		print(e)
 		return make_response(redirect(g.site_root + '/registered_fail'))
 

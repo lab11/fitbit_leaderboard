@@ -40,7 +40,6 @@ class fitbit_manager:
 	# After the user has approved this application to connect to their account
 	# run this to add the user to the database
 	def add_user (self, db, token, verifier, meta=None):
-		print('adding user')
 		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
 		secret = db.get_oauth_secret(token)
 		old_token = {'oauth_token': token, 'oauth_token_secret': secret}
@@ -49,7 +48,6 @@ class fitbit_manager:
 		utoken = user_token['oauth_token']
 		usecret = user_token['oauth_token_secret']
 
-		print('got token')
 		u_info = self.get_user_fitbit_info(utoken, usecret)
 		if 'encodedId' not in u_info:
 			printf("Not a valid user info dict")
@@ -86,11 +84,11 @@ class fitbit_manager:
 				continue
 			try:
 				oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
-					                         self.CONSUMER_SECRET,
-					                         user_key=user['key'],
-					                         user_secret=user['secret'])
+								 self.CONSUMER_SECRET,
+								 resource_owner_key=user['key'],
+								 resource_owner_secret=user['secret'])
 				res = oauth_fitbit.time_series('activities/steps',
-					                       period='{0}d'.format(number_of_days))
+							       period='{0}d'.format(number_of_days))
 				userid = int(user['id'])
 				for item in res['activities-steps']:
 					day = item['dateTime']
