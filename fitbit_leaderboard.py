@@ -100,16 +100,15 @@ def registered_data():
 	if reg_info != None:
 		reg_info = json.loads(reg_info)
 
-	print(fm)
-
 	try:
 		fm.add_user(db=g.db,
+		            token=request.args.get('oauth_token'),
 		            verifier_pin=request.args.get('oauth_verifier'),
 		            meta=reg_info)
 	except Exception as e:
 		print(e)
 		return make_response(redirect(g.site_root + '/registered_fail'))
-		
+
 
 	return make_response(redirect(g.site_root + '/registered'))
 

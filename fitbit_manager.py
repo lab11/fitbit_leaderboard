@@ -29,17 +29,22 @@ class fitbit_manager:
 
 	# Start the process of connecting to fitbit
 	def get_auth_url (self, db, callback_url):
-		self.oa = fitbit.Fitbit(self.CONSUMER_KEY,
-		                        self.CONSUMER_SECRET,
-		                        callback_uri=callback_url)
-		self.oa.client.fetch_request_token()
-		return self.oa.client.authorize_token_url()
+		oa = fitbit.Fitbit(self.CONSUMER_KEY,
+		                   self.CONSUMER_SECRET,
+		                   callback_uri=callback_url)
+		token = oa.client.fetch_request_token()
+		db.store_oauth_secret(key=token['oauth_token'],
+		                      secret=token['oauth_token_secret'])
+		return oa.client.authorize_token_url()
 
 	# After the user has approved this application to connect to their account
-	# run this to add the user to the databasei
-	def add_user (self, db, verifier_pin, meta=None):
+	# run this to add the user to the database
+	def add_user (self, db, token, verifier, meta=None):
 		print('adding user')
-		user_token = self.oa.client.fetch_access_token(verifier_pin)
+		oa = fitbit.Fitbit(self.CONSUMER_KEY, self.CONSUMER_SECRET)
+		secret = db.get_oauth_secret(token)
+		old_token = {'oauth_token': token, 'oauth_token_secret': secret}
+		user_token = oa.client.fetch_access_token(verifier, old_token)
 
 		utoken = user_token['oauth_token']
 		usecret = user_token['oauth_token_secret']
@@ -71,7 +76,7 @@ class fitbit_manager:
 
 		return res
 
-	# Retreive recent step information from fitbit and insert it into the
+	# Retrieve recent step information from fitbit and insert it into the
 	# database.
 	def update (self, db, number_of_days=1, fitbit_id=None):
 		users = db.get_users()
