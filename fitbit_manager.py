@@ -110,6 +110,20 @@ class fitbit_manager:
 				print exc
 				pass
 
+	# Retrieve recent step information from fitbit and insert it into the
+	# database.
+	def get_device_info (self, db):
+		users = db.get_users()
+
+		for user in users:
+			oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
+				                         self.CONSUMER_SECRET,
+				                         user_key=user['key'],
+				                         user_secret=user['secret'])
+			res = oauth_fitbit.get_devices()
+			print(res)
+
+
 	# Returns the url for the image offset from the root of the application.
 	# avatar_url is the fitbit image url passed with the user profile data.
 	def get_avatar_relative_url (self, avatar_url):
