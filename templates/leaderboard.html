@@ -248,7 +248,8 @@ function updateLeaderBoard(data) {
   step_labels.transition()
     .duration(750)
     .attr("x", function(d){ return xScale(d.userid) + xScale.rangeBand()/2 })
-    .attr("y", function(d){ return yScale(d.total_steps) - 4 });
+    .attr("y", function(d){ return yScale(d.total_steps) - 4 })
+    .text(function(d){ return d.total_steps });
 
   step_labels.enter()
     .append("text")
@@ -275,7 +276,8 @@ function updateLeaderBoard(data) {
     .attr("x", function(d){ return xScale(d.userid) })
     .attr("y", function(d){ return yScale(0) + 30 })
     .attr('width', xScale.rangeBand())
-    .attr('height', xScale.rangeBand());
+    .attr('height', xScale.rangeBand())
+    .attr("xlink:href", function(d){ return  d.image });
 
   step_pics.enter()
     .append("svn:image")
