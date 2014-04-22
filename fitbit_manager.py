@@ -112,14 +112,23 @@ class fitbit_manager:
 	# database.
 	def get_device_info (self, db):
 		users = db.get_users()
-
+		out = {}
+		meta = db.get_users_meta()
 		for user in users:
-			oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
-				                         self.CONSUMER_SECRET,
-				                         user_key=user['key'],
-				                         user_secret=user['secret'])
-			res = oauth_fitbit.get_devices()
-			print(res)
+			try:
+				oauth_fitbit = fitbit.Fitbit(self.CONSUMER_KEY,
+							     self.CONSUMER_SECRET,
+							     resource_owner_key=user['key'],
+							     resource_owner_secret=user['secret'])
+				res = oauth_fitbit.get_devices()[0]
+				if 'mac' in res:
+					res['meta'] = meta[user['id']]
+					out[user['fitbit_id']] = res
+			
+			except Exception as e:
+				print(e)
+
+		return out
 
 
 	# Returns the url for the image offset from the root of the application.
