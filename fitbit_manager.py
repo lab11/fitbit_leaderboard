@@ -205,6 +205,7 @@ class fitbit_manager:
 			if meta == None:
 				continue
 			db.add_meta(user['id'], meta)
+		self.cache_images(db)
 
 	# Locally download all user images. Does not re-download images.
 	def cache_images (self, db):
