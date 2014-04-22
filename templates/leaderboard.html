@@ -189,8 +189,9 @@ function updateLeaderBoard(data) {
   data.forEach(function(d) {
     var y0 = 0;
     d.step_counts.forEach(function(daystep){
+      ydelta = Math.max(1, daystep.steps);
       daystep.y0 = y0;
-      daystep.y1 = y0 + daystep.steps;
+      daystep.y1 = y0 + ydelta;
       daystep.x = xScale(d.userid)
       y0 = daystep.y1;
       step_array.push(daystep);
