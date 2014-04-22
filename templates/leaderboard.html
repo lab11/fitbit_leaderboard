@@ -42,7 +42,7 @@
 
 <script>
 
-var margin = {top: 30, right: 0, bottom: 40, left: 60}
+var margin = {top: 30, right: 0, bottom: 170, left: 60}
 var width = document.documentElement.clientWidth - margin.left - margin.right - 30
 var height = document.documentElement.clientHeight - margin.top - margin.bottom - 90
 
@@ -262,6 +262,33 @@ function updateLeaderBoard(data) {
     .attr("y", function(d){ return yScale(d.total_steps) - 4});
 
   step_labels.exit()
+    .transition()
+    .duration(750)
+    .style("opacity", 0)
+    .remove();
+
+  step_pics = svg.selectAll(".step-pics")
+                      .data(data)
+
+  step_pics.transition()
+    .duration(750)
+    .attr("x", function(d){ return xScale(d.userid) })
+    .attr("y", function(d){ return yScale(0) + 30 })
+    .attr('width', xScale.rangeBand())
+    .attr('height', xScale.rangeBand());
+
+  step_pics.enter()
+    .append("svn:image")
+    .attr("class", "step_pics")
+    .attr("xlink:href", function(d){ return  d.image })
+    .attr('width', xScale.rangeBand())
+    .attr('height', xScale.rangeBand())
+    .transition()
+    .duration(750)
+    .attr("x", function(d){ return xScale(d.userid) })
+    .attr("y", function(d){ return yScale(0) + 30});
+
+  step_pics.exit()
     .transition()
     .duration(750)
     .style("opacity", 0)

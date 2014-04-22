@@ -124,7 +124,7 @@ class fitbit_manager:
 				if 'mac' in res:
 					res['meta'] = meta[user['id']]
 					out[user['fitbit_id']] = res
-			
+
 			except Exception as e:
 				print(e)
 
@@ -149,7 +149,7 @@ class fitbit_manager:
 				break
 
 		if img_name:
-			return self.IMG_WEB_PREFIX + img_name
+			return self.IMG_WEB_PREFIX + '/' + img_name
 		return ""
 
 
