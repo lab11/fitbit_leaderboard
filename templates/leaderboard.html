@@ -166,7 +166,7 @@ function updateLeaderBoard(data) {
   }
 
   legend_rects = svg.selectAll(".legend-rect")
-                        .data(current_week);
+    .data(current_week);
 
   legend_rects.transition()
     .duration(750)
@@ -189,26 +189,26 @@ function updateLeaderBoard(data) {
   data.forEach(function(d) {
     var y0 = 0;
     d.step_counts.forEach(function(daystep){
-      ydelta = Math.max(1, daystep.steps);
-      daystep.y0 = y0;
-      daystep.y1 = y0 + ydelta;
-      daystep.x = xScale(d.userid)
-      y0 = daystep.y1;
+      ydelta         = Math.max(1, daystep.steps);
+      daystep.y0     = y0;
+      daystep.y1     = y0 + ydelta;
+      daystep.x      = xScale(d.userid);
+      y0             = daystep.y1;
+      daystep.ident  = "" + d.userid + daystep.day;
       step_array.push(daystep);
     });
     userid_mapping[d.userid] = d.username;
   });
 
   user_steps = svg.selectAll(".step-bars")
-  	.data( step_array )
+  	.data(step_array, function (d, i) { return d.ident });
 
   user_steps.transition()
       .duration(750)
       .attr("x", function(d){ return d.x })
       .attr("y", function(d){ return yScale(d.y1) })
       .attr("height", function(d){ return yScale(d.y0) - yScale(d.y1) })
-      .attr("width", xScale.rangeBand())
-      .style("fill", function(d){ return cScale(d.day) });
+      .attr("width", xScale.rangeBand());
 
   user_steps.enter()
       .append("rect")
@@ -243,11 +243,10 @@ function updateLeaderBoard(data) {
     .call(yAxis);
 
   step_labels = svg.selectAll(".step-labels")
-                      .data(data)
+    .data(data, function (d, i) { return d.userid });
 
   step_labels.transition()
     .duration(750)
-    .text(function(d){ return d.total_steps })
     .attr("x", function(d){ return xScale(d.userid) + xScale.rangeBand()/2 })
     .attr("y", function(d){ return yScale(d.total_steps) - 4 });
 
@@ -255,6 +254,7 @@ function updateLeaderBoard(data) {
     .append("text")
     .attr("class", "step-labels")
     .attr("text-anchor", "middle")
+    .attr()
     .text(function(d){ return d.total_steps })
     .transition()
     .duration(750)
@@ -268,7 +268,7 @@ function updateLeaderBoard(data) {
     .remove();
 
   step_pics = svg.selectAll(".step-pics")
-                      .data(data)
+    .data(data, function (d, i) { return d.userid });
 
   step_pics.transition()
     .duration(750)
