@@ -28,10 +28,10 @@ fm.update(db=db, number_of_days=7)
 fm.update_all_meta(db=db)
 fm.cache_images(db=db)
 
-
+# Update steps for all users
 def update_fitbit ():
 	while True:
-		print "Fitbit Online Update"
+		print("Fitbit Online Update")
 		db = fitbit_db.fitbit_db(app.config['DATABASE'])
 		uffm = fitbit_manager.fitbit_manager(
 			consumer_key=app.config['CONSUMER_KEY'],
@@ -43,15 +43,34 @@ def update_fitbit ():
 		minutes = 60.0
 		rate = ceil((minutes / app.config['REQUESTS_PER_HOUR']) * \
 		            len(db.get_users()))
-		rate += 1	# Reduce request rate as a saftey margin
+		rate += 1	# Reduce request rate as a safety margin
 		db.close()
-		print "Sleep Info. rate: {0}, current time: {1}".format(rate,
-			datetime.now())
+		print("Sleep Info. rate: {0}, current time: {1}".format(rate,
+			datetime.now()))
 		time.sleep(rate * 60)	# Sleep operates in seconds, not minutes
 
-t = Timer(1, update_fitbit)
-t.daemon = True
-t.start()
+t1 = Timer(1, update_fitbit)
+t1.daemon = True
+t1.start()
+
+# Update meta information once an hour
+def update_user_meta ():
+	while True:
+		print("Fitbit Online Meta Update")
+		db = fitbit_db.fitbit_db(app.config['DATABASE'])
+		uffm = fitbit_manager.fitbit_manager(
+			consumer_key=app.config['CONSUMER_KEY'],
+			consumer_secret=app.config['CONSUMER_SECRET'],
+			user_img_location=app.config['USER_IMG_LOCATION'],
+			user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
+		uffm.update_all_meta()
+		db.close()
+		# Sleep for an hour
+		time.sleep(3600)	# Sleep operates in seconds, not minutes
+
+t2 = Timer(1, update_user_meta)
+t2.daemon = True
+t2.start()
 
 
 @app.before_request
