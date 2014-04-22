@@ -63,7 +63,7 @@ def update_user_meta ():
 			consumer_secret=app.config['CONSUMER_SECRET'],
 			user_img_location=app.config['USER_IMG_LOCATION'],
 			user_img_web_prefix=app.config['USER_IMG_WEB_PREFIX'])
-		uffm.update_all_meta()
+		uffm.update_all_meta(db)
 		db.close()
 		# Sleep for an hour
 		time.sleep(3600)	# Sleep operates in seconds, not minutes
