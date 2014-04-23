@@ -277,12 +277,12 @@ function updateLeaderBoard(data) {
     .attr("y", function(d){ return yScale(0) + 30 })
     .attr('width', xScale.rangeBand())
     .attr('height', xScale.rangeBand())
-    .attr("xlink:href", function(d){ return  d.image });
+    .attr("xlink:href", function(d){ return "" + d.image + "" });
 
   step_pics.enter()
-    .append("svn:image")
+    .append("svg:image")
     .attr("class", "step-pics")
-    .attr("xlink:href", function(d){ return  d.image })
+    .attr("xlink:href", function(d){ return "" + d.image + "" })
     .attr('width', xScale.rangeBand())
     .attr('height', xScale.rangeBand())
     .transition()
