@@ -1,8 +1,7 @@
-from datetime import datetime
+import datetime
 import fitbit
-#import oauth2 as oauth
 import os
-import urllib2
+import urllib.request
 
 day_converter = {
 	0: 'm',
@@ -50,7 +49,7 @@ class fitbit_manager:
 
 		u_info = self.get_user_fitbit_info(utoken, usecret)
 		if 'encodedId' not in u_info:
-			printf("Not a valid user info dict")
+			print("Not a valid user info dict")
 			return
 		fitbit_id = u_info['encodedId']
 
@@ -69,7 +68,6 @@ class fitbit_manager:
 				                         resource_owner_secret=secret)
 			res = oauth_fitbit.user_profile_get()['user']
 		except fitbit.exceptions.HTTPUnauthorized as e:
-			print "User keys invalid: {0} {1}".format(key, secret)
 			res = None
 
 		return res
@@ -96,16 +94,16 @@ class fitbit_manager:
 
 					db.update_steps(userid, day, steps)
 			except fitbit.exceptions.HTTPUnauthorized as e:
-				print e
+				print(e)
 			except fitbit.exceptions.HTTPBadRequest as ex:
-				print ex
+				print(ex)
 
 #			except ConnectionError as exc:
 #				print "Could not connect to fitbit"
 #				print exc
 
 			except Exception as exc:
-				print exc
+				print(exc)
 				pass
 
 	# Retrieve recent step information from fitbit and insert it into the
@@ -162,7 +160,7 @@ class fitbit_manager:
 		for item in week_data:
 			userid   = item[0]
 			username = item[1]
-			mdate    = datetime.strptime(item[2], "%Y-%m-%d")
+			mdate    = datetime.datetime.strptime(item[2], "%Y-%m-%d")
 			day      = day_converter[mdate.weekday()]
 			steps    = item[3]
 			avatar   = self.get_avatar_relative_url(item[4])
@@ -180,7 +178,7 @@ class fitbit_manager:
 			users[userid]['step_counts'].append({'day':day, 'steps':steps})
 
 		data = []
-		for k,v in users.iteritems():
+		for k,v in users.items():
 			# Skip users who don't have any steps
 			if v['total'] == 0:
 				continue
@@ -227,10 +225,9 @@ class fitbit_manager:
 					break
 
 				try:
-					u = urllib2.urlopen(avatar_url_dir + '/' + i)
-					img = open(self.IMG_LOC + '/' + i, 'w')
-					img.write(u.read())
-					img.close()
+					u = urllib.request.urlopen(avatar_url_dir + '/' + i)
+					with open(self.IMG_LOC + '/' + i, 'wb') as img:
+						img.write(u.read())
 					break
 				except Exception as e:
 					pass

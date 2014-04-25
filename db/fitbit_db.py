@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date, timedelta
+import datetime
 
 TABLE_PREFIX = "fitbit_lb_"
 
@@ -19,7 +19,6 @@ class fitbit_db:
 
 	# Retreive the temporary secret that is associated with a given token
 	def get_oauth_secret (self, token):
-		print "token: {0}".format(token)
 		q = """SELECT oauth_secret
 		       FROM {0}fitbit_oauth
 		       WHERE oauth_token = ?
@@ -27,13 +26,12 @@ class fitbit_db:
 		cur = self.db.execute(q, (token,))
 		row = cur.fetchone()
 		if not row:
-			print "Nothing retreived"
+			raise Exception('Could not find secret for token')
 		return row[0]
 
 	# Add a user after registration to the database. Adds the keys and the
 	# meta information.
 	def add_user (self, fitbit_id, key, secret, meta=None):
-		print "ADD USER: key {0}, secret {1}".format(key, secret)
 		# Check if user is already in database
 		user_id = self.get_user_id(fitbit_id)
 		if user_id:
@@ -133,7 +131,7 @@ class fitbit_db:
 
 	# Get a week's worth of data from the database
 	def get_week (self):
-		week = date.today()-timedelta(days=7)
+		week = datetime.date.today()-datetime.timedelta(days=7)
 
 		q = """SELECT um.user_id, um.display_name, s.day, s.steps, um.avatar
 		       FROM {0}users as u
