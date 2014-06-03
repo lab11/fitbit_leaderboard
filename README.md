@@ -6,46 +6,24 @@ Web application to display a graph of users' weekly steps based on fitbit.com.
 Dependencies
 ------------
 
-The Fitbit Leaderboard runs on Python 3 and requires a few extra packages
-to be installed.
+Fitbit Leaderboard requires a few dependencies to be installed.
 
-    sudo pip3 install flask fitbit
+```
+pip install oauth2
+pip install flask
+pip install fitbit
+```
 
+Running Locally
+---------------
 
-
-Running a Test Instance
------------------------
-
-The first thing you must configure are the options to the fitbit leaderboard.
-Copy `reference_config.py` to `fl_config.py` and update the entries.
-
-Once you have done that, there are a couple ways to test the fitbit leaderboard:
-
-### Test, Fake Data
-
-The fitbit leaderboard can be run with fake data to test the operation. To
-create a test database with fake data run:
-
-    ./create_test_db.py
-
-Then the actual leaderboard webserver can be run with:
-
-    ./fitbit_leaderboard.py --no-update
-
-Browse to http://127.0.0.1:5000 to view the site.
-
-### Test, Real Data
-
-To use the fitbit leaderboard properly you need to register with fitbit.com
-to get API keys. Then `fl_config.py` with the correct API values.
+To run the server on your localhost you need to update fl_config.py with your
+specific settings. This means getting api keys and setting the paths.
+reference_config.py is a sample version of fl_config.
 
 Then simply:
 
-    ./fitbit_leaderboard.py
-
-### Real Webserver, Real Data
-
-Register with fitbit.com and update `fl_config.py`. Then use nginx and uwsgi.
+    python fitbit_leaderboard.py
 
 
 Run With nginx and uWsgi
