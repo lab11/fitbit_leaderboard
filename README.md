@@ -19,7 +19,6 @@ Running Locally
 
 To run the server on your localhost you need to update fl_config.py with your
 specific settings. This means getting api keys and setting the paths.
-reference_config.py is a sample version of fl_config.
 
 Then simply:
 
